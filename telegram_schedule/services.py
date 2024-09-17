@@ -10,6 +10,8 @@ from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message
 
+from apscheduler.schedulers.background import BackgroundScheduler
+
 
 TOKEN = TG_API_TOKEN
 
@@ -46,3 +48,17 @@ async def main() -> None:
 def start_polling():
     logging.basicConfig(level=logging.INFO, stream=sys.stdout)
     asyncio.run(main())
+
+
+def print_hello():
+    print("HELLO")
+
+
+def start_scheduler():
+    scheduler = BackgroundScheduler()
+
+    if not scheduler.get_jobs():
+        scheduler.add_job(print_hello, 'interval', seconds=10)
+
+    if not scheduler.running:
+        scheduler.start()

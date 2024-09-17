@@ -32,7 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'heroes',
     'users',
-    #'telegram_schedule',
+    'telegram_schedule',
 ]
 
 MIDDLEWARE = [

@@ -124,6 +124,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
 
-RUN_POLLING = os.getenv('RUN_POLLING')
+RUN_TELEGRAM = os.getenv('RUN_TELEGRAM')
 
 TG_API_TOKEN = os.getenv('TG_API_TOKEN')

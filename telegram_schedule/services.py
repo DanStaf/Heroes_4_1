@@ -90,7 +90,7 @@ def start_polling():
 def get_updates():
     # telebot.apihelper.get_updates()
     bot = telebot.TeleBot(TG_API_TOKEN)
-    res = bot.get_updates(-2)
+    res = bot.get_updates()
     # ответ в формате update_id, message
     # параметр 869593995 - первый update_id, с которого нужно начинать читать
 
@@ -98,3 +98,15 @@ def get_updates():
         f"{item.message.text} from {item.message.chat.id} {item.message.from_user.username}"
 
     ) for item in res]
+    print("/n")
+
+
+def start_scheduler_updates():
+
+    scheduler = BackgroundScheduler()
+
+    if not scheduler.get_jobs():
+        scheduler.add_job(get_updates, 'interval', seconds=10)
+
+    if not scheduler.running:
+        scheduler.start()

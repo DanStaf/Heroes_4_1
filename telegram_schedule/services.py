@@ -12,6 +12,8 @@ from aiogram.types import Message
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
+import telebot
+
 
 TOKEN = TG_API_TOKEN
 
@@ -50,11 +52,38 @@ def start_polling():
     asyncio.run(main())
 
 
+##############
+
+
+def start_scheduler(my_task, interval_sec):
+    scheduler = BackgroundScheduler()
+
+    if not scheduler.get_jobs():
+        scheduler.add_job(my_task, 'interval', seconds=interval_sec)
+
+    if not scheduler.running:
+        scheduler.start()
+
+
 def print_hello():
     print("HELLO")
 
 
-def start_scheduler():
+def start_scheduler_hello():
+    start_scheduler(print_hello, 10)
+
+
+def good_morning():
+    text = "Доброе утро!"
+    print(text)
+
+    # bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+
+    bot = telebot.TeleBot(TG_API_TOKEN)
+    bot.send_message(1816252417, text)
+
+
+def start_scheduler_good_morning():
     scheduler = BackgroundScheduler()
 
     if not scheduler.get_jobs():
@@ -62,3 +91,4 @@ def start_scheduler():
 
     if not scheduler.running:
         scheduler.start()
+

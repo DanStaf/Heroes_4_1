@@ -5,6 +5,7 @@ import telebot
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
+from heroes.models import Hero
 
 def start_scheduler(my_task, interval_sec):
     scheduler = BackgroundScheduler()
@@ -82,8 +83,23 @@ def start_scheduler_mentor():
         scheduler.start()
 
 
+bot = telebot.TeleBot(TG_API_TOKEN)
+
+
+@bot.message_handler()
+def send_welcome(message):
+
+    my_heroes = Hero.objects.all()
+    my_text = f"Hi! Your message: {message.text}\n My heroes: "
+
+    for hero in my_heroes:
+        my_text += f"\n {hero}"
+
+    msg = bot.reply_to(message, my_text)
+
+
 def start_polling():
-    bot = telebot.TeleBot(TG_API_TOKEN)
+    # bot = telebot.TeleBot(TG_API_TOKEN)
     bot.infinity_polling()
 
 

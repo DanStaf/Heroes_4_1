@@ -7,11 +7,11 @@ class TelegramScheduleConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'telegram_schedule'
 
-    def ready(self):
+    """def ready(self):
         if RUN_TELEGRAM == 'TRUE':
             from telegram_schedule.services import start_scheduler_updates
             sleep(1)
-            start_scheduler_updates()
+            # start_scheduler_updates()
             print('tg started')
         else:
-            print('tg not started')
+            print('tg not started')"""

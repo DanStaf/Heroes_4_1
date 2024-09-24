@@ -1,12 +1,15 @@
+from telebot import types
+
 from heroes.models import Hero
 from users.models import User
 
-# from services_connector import fill_new_user_mentor
+from telegram_schedule.services_connector import create_new_user_mentor, get_4_last_training_dates
 
 from config.settings import TG_API_TOKEN
 import telebot
 
 bot = telebot.TeleBot(TG_API_TOKEN)
+actual_polls = []
 
 
 @bot.message_handler(commands=['start'])
@@ -28,16 +31,13 @@ def start_message(message):
 @bot.message_handler(func=lambda message: True)
 def text_messages(message):
     print(message.from_user.username, 'sent:', message.text)
-    #bot.send_message(message.chat.id, f'ОК')
     chose_action(message)
 
 
-@bot.poll_answer_handler()
+@bot.poll_answer_handler(func=lambda poll_answer: True)
 def handle_poll_answer(poll_answer):
-    # connector.user_poll_input(poll_answer)
-    bot.send_message(poll_answer.chat.id, f'ОК')
-
-
+    print('received')
+    user_poll_input(poll_answer)
 
 
 """@bot.message_handler()
@@ -60,13 +60,6 @@ def start_polling():
 ##############
 
 
-def create_new_user_mentor(message):
-    new_mentor = User.objects.create(tg_id=message.from_user.id,
-                                     first_name=message.from_user.first_name,
-                                     last_name=message.from_user.last_name)
-    new_mentor.set_password('12345')
-
-
 def offer_next_actions(message):
 
     msg = bot.send_message(message.chat.id,
@@ -79,17 +72,18 @@ def offer_next_actions(message):
 def add_options_keyboard(next_key=None):
 
     if next_key is None:
-        buttons = ["Добавить маму или папу",
-                   "Добавить героя",
-                   "Добавить новичка",
-                   "Добавить наставника или вожатую",
-                   "Добавить продукт",
-                   "Добавить платёж",
-                   "Добавить ячейку",
-                   "Отметить явку",
-                   "Посмотреть явку",
-                   "Посмотреть всех людей"
-                   ]
+        buttons = [
+            # "Добавить маму или папу",
+            # "Добавить героя",
+            #       "Добавить новичка",
+            #       "Добавить наставника или вожатую",
+            #       "Добавить продукт",
+            #       "Добавить платёж",
+            #       "Добавить ячейку",
+            "Отметить явку",
+            "Посмотреть явку",
+            "Посмотреть всех героев"
+            ]
 
     elif next_key == "sex":
         buttons = ["м",
@@ -119,8 +113,8 @@ def add_options_keyboard(next_key=None):
                        'Вожатая 0+'
                        ]
     elif next_key == 'date_':
-        # buttons = self.get_4_last_training_dates()
-        buttons = None
+        buttons = get_4_last_training_dates()
+        # buttons = None
     else:
         buttons = None
 
@@ -129,6 +123,49 @@ def add_options_keyboard(next_key=None):
         return keyboard
     else:
         return None
+
+
+def get_reply_keyboard(buttons: list):
+        keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=len(buttons))
+
+        b = []
+        i = 0
+        for text in buttons:
+            button = telebot.types.KeyboardButton(text)
+            b.append(button)
+
+            i += 1
+            if i > 1:
+                keyboard.add(*b)
+                b.clear()
+                i = 0
+
+        if i > 0:
+            keyboard.add(*b)
+
+        return keyboard
+
+
+def get_inline_keyboard(buttons: dict):
+        keyboard = telebot.types.InlineKeyboardMarkup(row_width=len(buttons))
+
+        b = []
+        i = 0
+        for key, value in buttons.items():
+
+            button = telebot.types.InlineKeyboardButton(value, callback_data=key)
+            b.append(button)
+
+            i += 1
+            if i > 1:
+                keyboard.add(*b)
+                b.clear()
+                i = 0
+
+        if i > 0:
+            keyboard.add(*b)
+
+        return keyboard
 
 
 def chose_action(message):
@@ -209,14 +246,14 @@ def chose_action(message):
 
         elif message.text == 'Отметить явку':
 
-            """msg = bot.send_message(message.chat.id,
+            msg = bot.send_message(message.chat.id,
                                         f'Выберите дату:',
                                         reply_markup=add_options_keyboard("date_"))
 
             bot.register_next_step_handler(msg, start_attendance_poll)
 
-            flag = False"""
-            bot.send_message(message.chat.id, "Действие пока не реализовано")
+            flag = False
+            # bot.send_message(message.chat.id, "Действие пока не реализовано")
 
         elif message.text == 'Посмотреть явку':
 
@@ -259,44 +296,68 @@ def chose_action(message):
             # user_text_input(message, new_line, None, self.db.insert_values, table_name, self.offer_next_actions)
 
 
-def get_reply_keyboard(buttons: list):
-        keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=len(buttons))
-
-        b = []
-        i = 0
-        for text in buttons:
-            button = telebot.types.KeyboardButton(text)
-            b.append(button)
-
-            i += 1
-            if i > 1:
-                keyboard.add(*b)
-                b.clear()
-                i = 0
-
-        if i > 0:
-            keyboard.add(*b)
-
-        return keyboard
+################
 
 
-def get_inline_keyboard(buttons: dict):
-        keyboard = telebot.types.InlineKeyboardMarkup(row_width=len(buttons))
+def start_attendance_poll(message):
+    data = Hero.objects.all()
+    training_date = message.text
 
-        b = []
-        i = 0
-        for key, value in buttons.items():
+    msg = bot.send_poll(message.chat.id,
+                        f"Явка за {training_date}:",
+                        options=[str(item) for item in data],
+                        type='regular',
+                        allows_multiple_answers=True,
+                        is_anonymous=False,
+                        reply_markup=add_options_keyboard()
+                        )
+    bot.register_next_step_handler(msg, chose_action)
 
-            button = telebot.types.InlineKeyboardButton(value, callback_data=key)
-            b.append(button)
+    poll_structure = {'id': msg.poll.id,
+                      'date': training_date,
+                      'options': data
+                      }
 
-            i += 1
-            if i > 1:
-                keyboard.add(*b)
-                b.clear()
-                i = 0
+    actual_polls.append(poll_structure)
 
-        if i > 0:
-            keyboard.add(*b)
 
-        return keyboard
+def user_poll_input(poll_answer):
+
+    print('OK')
+
+    '''ids = [item['id'] for item in actual_polls]
+    poll_id = ids.index(poll_answer.poll_id)
+    poll = actual_polls[poll_id]
+
+    print(poll['date'])
+        #data_training = [1, 1, poll['date']]
+        #new_line = self.db.add_line('trainings', data_training, 'cell_id, mentor_id, training_date', 'id')
+
+        #training_id = new_line[0]
+
+        """data_attendance = [
+            [training_id, item[0]]
+            for i, item in enumerate(poll['options'])
+            if i in poll_answer.option_ids
+        ]
+
+        print(data_attendance)
+        self.db.fill_table('attendance', data_attendance)"""
+
+    actual_polls.remove(poll)
+
+
+        # print(msg.poll.options[poll_answer.option_ids])
+
+        """self.bot.
+
+        training_date = None
+
+        text = f'добавлена явка за {training_date}.'
+
+        msg = self.bot.send_message(message.chat.id,
+                                    text,
+                                    reply_markup=self.add_options_keyboard())
+        self.bot.register_next_step_handler(msg, self.chose_action)"""
+
+    bot.send_message(poll_answer.chat.id, f'ОК')'''

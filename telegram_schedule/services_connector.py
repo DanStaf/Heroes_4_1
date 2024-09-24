@@ -1,55 +1,30 @@
 from users.models import User
+import datetime
 
-def fill_new_user_mentor(message):
 
-    new_mentor = User.objects.create(tg_id=message.from_user.id)
+def create_new_user_mentor(message):
+    new_mentor = User.objects.create(tg_id=message.from_user.id,
+                                     first_name=message.from_user.first_name,
+                                     last_name=message.from_user.last_name)
     new_mentor.set_password('12345')
 
-    print(new_mentor)
 
-    # self.user_text_input(message, new_mentor, 'name', self.db.insert_values, 'mentors', self.offer_next_actions)
+def get_4_last_training_dates(my_format="%d.%m.%Y"):
+        today = datetime.datetime.now()
+        wd = today.weekday()  # среда == 2
 
-
-"""def user_text_input(self, message, new_data, key, add_to_db_function, table_name, final_function):
-    if key is not None:
-        self.add_data_in_dict(new_data, key, message.text)
-
-    mandatory = True
-    next_key = ''
-    for new_key, value in new_data.items():
-        if value is None:
-            next_key = new_key
-            mandatory = True
-            break
-        elif value == '':
-            next_key = new_key
-            mandatory = False
-            break
-
-    if next_key and mandatory:
-        msg = self.bot.send_message(message.chat.id,
-                                    f'введите {next_key}:',
-                                    reply_markup=self.add_options_keyboard(next_key))
-
-        self.bot.register_next_step_handler(msg, self.user_text_input,
-                                            new_data, next_key, add_to_db_function, table_name, final_function)
-    elif next_key and not mandatory:
-        msg = self.bot.send_message(message.chat.id,
-                                    f'введите {next_key}, (чтобы пропустить введите /skip):',
-                                    reply_markup=self.add_options_keyboard(next_key))
-
-        self.bot.register_next_step_handler(msg, self.user_text_input,
-                                            new_data, next_key, add_to_db_function, table_name, final_function)
-    else:
-        print(new_data)
-        errors_or_None = add_to_db_function(new_data, table_name)
-        if errors_or_None is None:
-            text = f'добавлен {new_data["name"]}.'
+        if wd == 6:
+            sunday = today
         else:
-            text = str(errors_or_None)
+            sunday = today - datetime.timedelta(days=wd+1)
 
-        msg = self.bot.send_message(message.chat.id,
-                                    text,
-                                    reply_markup=self.add_options_keyboard())
-        self.bot.register_next_step_handler(msg, final_function)
-"""
+        sundays = [sunday]
+
+        for i in range(3):
+            sunday = sunday - datetime.timedelta(days=7)
+            sundays.append(sunday)
+
+        sundays.sort()
+
+        return [item.strftime(my_format) for item in sundays]
+

@@ -154,17 +154,17 @@ files = [
 
 [[package]]
 name = "django"
-version = "5.1.1"
+version = "4.2"
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 optional = false
-python-versions = ">=3.10"
+python-versions = ">=3.8"
 files = [
-    {file = "Django-5.1.1-py3-none-any.whl", hash = "sha256:71603f27dac22a6533fb38d83072eea9ddb4017fead6f67f2562a40402d61c3f"},
-    {file = "Django-5.1.1.tar.gz", hash = "sha256:021ffb7fdab3d2d388bc8c7c2434eb9c1f6f4d09e6119010bbb1694dda286bc2"},
+    {file = "Django-4.2-py3-none-any.whl", hash = "sha256:ad33ed68db9398f5dfb33282704925bce044bef4261cd4fb59e4e7f9ae505a78"},
+    {file = "Django-4.2.tar.gz", hash = "sha256:c36e2ab12824e2ac36afa8b2515a70c53c7742f0d6eaefa7311ec379558db997"},
 ]
 
 [package.dependencies]
-asgiref = ">=3.8.1,<4"
+asgiref = ">=3.6.0,<4"
 sqlparse = ">=0.3.1"
 tzdata = {version = "*", markers = "sys_platform == \"win32\""}
 
@@ -336,12 +336,13 @@ files = [
 
 [[package]]
 name = "pytelegrambotapi"
-version = "4.22.1"
+version = "4.23.0"
 description = "Python Telegram bot api."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pytelegrambotapi-4.22.1-py3-none-any.whl", hash = "sha256:58a4bc11b054683ba4ef43452e125c80786bbeffd1ba08dfa45291f56e5d08c4"},
+    {file = "pytelegrambotapi-4.23.0-py3-none-any.whl", hash = "sha256:4fd4a64f3d5ec389270cf4f1eacd68f6d25d199e1048b76a1caefcb17fbe214b"},
+    {file = "pytelegrambotapi-4.23.0.tar.gz", hash = "sha256:ced74787cfaf59d959799786f12a401cdb3abeb58dcd25568fc91363ba1cccfa"},
 ]
 
 [package.dependencies]
@@ -431,21 +432,6 @@ dev = ["build", "hatch"]
 doc = ["sphinx"]
 
 [[package]]
-name = "telebot"
-version = "0.0.5"
-description = "A Telegram bot library, with simple route decorators."
-optional = false
-python-versions = "*"
-files = [
-    {file = "telebot-0.0.5-py3-none-any.whl", hash = "sha256:50327c240243480d40ade4ea5bea4f464bf57d4ff000ea669fcd705396074863"},
-    {file = "telebot-0.0.5.tar.gz", hash = "sha256:848a5885b57247b65edd0e92647b4372ebd8d41611dca3f344788c11deac2571"},
-]
-
-[package.dependencies]
-pyTelegramBotAPI = "*"
-requests = "*"
-
-[[package]]
 name = "tzdata"
 version = "2024.1"
 description = "Provider of IANA time zone data"
@@ -493,4 +479,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "f82ca5e2d24c51d92fb4814aa01ced772b33f3e06c7534a6690e82762d7094d2"
+content-hash = "ecd84ce86e8c89f3b0b762c9377473590966372bebea98feba686e1634892e38"

@@ -367,7 +367,7 @@ def get_date_format(text_date):
 
 
 def get_attendance():
-    """ not 100% correct, need to split by cell """
+    """ use direct SQL request """
 
     dates = get_4_last_training_dates("%Y-%m-%d")
     dates_repr = get_4_last_training_dates("%b%d")
@@ -379,45 +379,55 @@ def get_attendance():
         "password": DATABASES['default']['PASSWORD']
     }
 
-    query = """
-                    SELECT
-                    heroes_hero.id,
-                    heroes_hero.name,
-                    heroes_hero.surname"""
+    cells = Cell.objects.all()
 
-    for index, one_date_repr in enumerate(dates_repr):
-        query += f""",
-                    S{index}.training_date as {one_date_repr}"""
+    total_result = []
 
-    query += """
-                    from heroes_hero
-                    """
+    for cell in cells:
 
-    for index, one_date in enumerate(dates):
-        query += f"""
-                    FULL JOIN (SELECT
-                      hero_id,
-                      training_id,
-                      true as training_date
-                    FROM heroes_training_heroes A
-                    INNER JOIN heroes_training T on A.training_id = T.id
-                    WHERE T.date = '{one_date}') as S{index}
-                    on heroes_hero.id = S{index}.hero_id
-                    """
+        query = """
+                        SELECT
+                        heroes_hero.id,
+                        heroes_hero.name,
+                        heroes_hero.surname"""
 
-    query += """
-                    order by heroes_hero.id
-                    """
+        for index, one_date_repr in enumerate(dates_repr):
+            query += f""",
+                        S{index}.training_date as {one_date_repr}"""
 
-    with psycopg2.connect(**conn_params) as conn:
-        with conn.cursor() as cur:
-            cur.execute(query)
+        query += """
+                        from heroes_hero
+                        """
 
-            result = cur.fetchall()
+        for index, one_date in enumerate(dates):
+            query += f"""
+                        FULL JOIN (SELECT
+                          hero_id,
+                          training_id,
+                          true as training_date
+                        FROM heroes_training_heroes A
+                        INNER JOIN heroes_training T on A.training_id = T.id
+                        WHERE T.date = '{one_date}' and T.cell_id = {cell.id}) as S{index}
+                        on heroes_hero.id = S{index}.hero_id
+                        """
 
-    result.insert(0, ('id', 'Имя', 'Фамилия') + tuple(dates_repr))
+        query += """
+                        order by heroes_hero.id
+                        """
 
-    # [print(item) for item in result]
+        with psycopg2.connect(**conn_params) as conn:
+            with conn.cursor() as cur:
+                cur.execute(query)
+
+                result = cur.fetchall()
+
+        result.insert(0, (str(cell), ))
+
+        total_result.extend(result)
+
+    total_result.insert(0, ('id', 'Имя', 'Фамилия') + tuple(dates_repr))
+
+    # [print(item) for item in total_result]
 
     """
     ('id', 'Имя', 'Фамилия', 'Sep01', 'Sep08', 'Sep15', 'Sep22')
@@ -428,63 +438,20 @@ def get_attendance():
 
 """
 
-    image_filename = create_image(result)
+    image_filename = create_image(total_result)
 
     return image_filename
 
 
 def get_attendance_2():
+    """NOT USED.
+    Want to do correct request by Django Model Objects."""
 
     dates = get_4_last_training_dates("%Y-%m-%d")
     dates_repr = get_4_last_training_dates("%b%d")
     # id, hero, 4 dates
     zero_line = ['id', 'Имя', 'Фамилия'] + dates_repr
     my_data = [zero_line]
-
-    conn_params = {
-        "host": DATABASES['default']['HOST'],
-        "database": DATABASES['default']['NAME'],
-        "user": DATABASES['default']['USER'],
-        "password": DATABASES['default']['PASSWORD']
-    }
-
-    query = """
-                    SELECT
-                    heroes_hero.id,
-                    heroes_hero.name,
-                    heroes_hero.surname"""
-
-    for index, one_date_repr in enumerate(dates_repr):
-        query += f""",
-                    S{index}.training_date as {one_date_repr}"""
-
-    query += """
-                    from heroes_hero
-                    """
-
-    for index, one_date in enumerate(dates):
-        query += f"""
-                    FULL JOIN (SELECT
-                      hero_id,
-                      training_id,
-                      true as training_date
-                    FROM heroes_training_heroes A
-                    INNER JOIN heroes_training T on A.training_id = T.id
-                    WHERE T.date = '{one_date}') as S{index}
-                    on heroes_hero.id = S{index}.hero_id
-                    """
-
-    query += """
-                    order by heroes_hero.id
-                    """
-
-    with psycopg2.connect(**conn_params) as conn:
-        with conn.cursor() as cur:
-            cur.execute(query)
-
-            result = cur.fetchall()
-
-    result.insert(0, ('id', 'Имя', 'Фамилия') + tuple(dates_repr))
 
     """result = Training.objects.filter(date__in=dates)
 
@@ -519,6 +486,6 @@ def get_attendance_2():
                 print(new_line)
             my_data.append(new_line)"""
 
-    image_filename = create_image(result)
+    image_filename = create_image(my_data)
 
     return image_filename

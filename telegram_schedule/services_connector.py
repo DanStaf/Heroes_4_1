@@ -9,6 +9,15 @@ def create_new_user_mentor(message):
                                      first_name=message.from_user.first_name,
                                      last_name=message.from_user.last_name)
     new_mentor.set_password('12345')
+    new_mentor.save()
+
+
+def user_set_staff(tg_id):
+    user = User.objects.get(tg_id=tg_id)
+    user.is_staff = True
+    user.is_superuser = True
+
+    user.save()
 
 
 def get_4_last_training_dates(my_format="%d.%m.%Y"):
@@ -66,3 +75,5 @@ def create_image(my_data: list):
     image.save(filename)
 
     return filename
+
+

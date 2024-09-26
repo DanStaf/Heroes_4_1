@@ -5,13 +5,15 @@ from heroes.models import Hero, Training, Cell, Parent
 from users.models import User
 
 from telegram_schedule.services_connector import create_new_user_mentor, get_4_last_training_dates, get_cells, \
-    create_image
+    create_image, user_set_staff
 
 from config.settings import TG_API_TOKEN, DATABASES
 import telebot
 
 bot = telebot.TeleBot(TG_API_TOKEN)
 actual_polls = []
+
+# user_set_staff(1816252417)
 
 
 @bot.message_handler(commands=['start'])
@@ -445,7 +447,9 @@ def get_attendance():
 
 def get_attendance_2():
     """NOT USED.
-    Want to do correct request by Django Model Objects."""
+    Want to do correct request by Django Model Objects.
+
+    в статусе Героя есть ячейка и наставник """
 
     dates = get_4_last_training_dates("%Y-%m-%d")
     dates_repr = get_4_last_training_dates("%b%d")

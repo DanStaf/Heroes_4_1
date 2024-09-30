@@ -1,0 +1,43 @@
+{% extends 'heroes/base.html' %}
+{% block content %}
+
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h1 class="display-4">Пользователи</h1>
+</div>
+
+<div class="container">
+
+    <div class="row text-center">
+
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">email</th>
+                <th scope="col">Имя</th>
+                <th scope="col">Фамилия</th>
+                <th scope="col">is_active</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for object in object_list %}
+            <tr>
+                <td>{{ object.email }}</td>
+                <td>{{ object.first_name }}</td>
+                <td>{{ object.last_name }}</td>
+                <td>
+                    {% if object.is_active %}
+                    <a class="p-2 btn btn-outline-danger" href="/users/change_active/{{ object.pk }}/"> Deactivate</a>
+                    {% else %}
+                    <a class="p-2 btn btn-outline-success" href="/users/change_active/{{ object.pk }}/"> Activate</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+{% endblock %}

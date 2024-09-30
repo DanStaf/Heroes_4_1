@@ -1,0 +1,27 @@
+<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
+    <a href="/"><h5 class="my-0 mr-md-auto font-weight-normal">Heroes CRM</h5></a>
+
+    <nav class="ms-5">
+
+        {% if user.is_authenticated %}
+            <a class="p-2 btn btn-outline-primary" href="{% url 'users:logout' %}"> Logout</a>
+            <a class="p-2 btn btn-outline-primary" href="{% url 'users:user-detail' %}"> Profile ({{ user.first_name }})</a>
+
+        {% else %}
+            <a class="p-2 btn btn-outline-primary" href="{% url 'users:login' %}">Login</a>
+            <a class="p-2 btn btn-outline-primary" href="{% url 'users:register' %}"> Register</a>
+        {% endif %}
+    </nav>
+
+    {% if perms.users.view_all_users %}
+    <nav class="ms-5">
+        <a class="p-2 btn btn-outline-primary" href="{% url 'users:user-list' %}">Users</a>
+    </nav>
+    {% endif %}
+
+    {% if user.is_superuser %}
+    <nav class="ms-5">
+        <a class="p-2 btn btn-outline-danger" href="/admin/"> Admin</a>
+    </nav>
+    {% endif %}
+</div>

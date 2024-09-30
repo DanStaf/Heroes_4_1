@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'heroes',
     'users',
     'telegram_schedule',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -127,3 +128,13 @@ AUTH_USER_MODEL = 'users.User'
 RUN_TELEGRAM = os.getenv('RUN_TELEGRAM')
 
 TG_API_TOKEN = os.getenv('TG_API_TOKEN')
+
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_PORT = 2525
+EMAIL_HOST_USER = os.getenv('EMAIL_')
+EMAIL_HOST_PASSWORD = os.getenv('PASSWORD_')
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'

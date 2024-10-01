@@ -1,11 +1,44 @@
 {% extends 'heroes/base.html' %}
 {% block content %}
 
-<h1>Heroes</h1>
-<ul>
-    {% for hero in heroes %}
-    <li>{{ hero.name }}</li>
-    {% endfor %}
-</ul>
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h1 class="display-4">Герои</h1>
+    <a class="p-2 btn btn-outline-primary" href="create/">+</a>
+</div>
+
+<div class="container">
+
+    <div class="row text-center">
+
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">Имя Фамилия</th>
+                <th scope="col">Статус</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for object in object_list %}
+            <tr>
+                <td>
+                    <a class="p-2 btn btn-outline-primary" href="/heroes/{{ object.pk }}/">{{ object }}</a>
+                </td>
+                <td>
+                    {% for status in object.herostatus_set.all %}
+                        {% if status.is_active %}
+                            {{ status.type }}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
 
 {% endblock %}

@@ -3,11 +3,11 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
-from heroes.forms import HeroForm, HeroStatusForm
+from heroes.forms import HeroForm, HeroStatusForm, ParentForm, ParentStatusForm
 # Create your views here.
 
 
-from heroes.models import Hero, HeroStatus
+from heroes.models import Hero, HeroStatus, Parent, ParentStatus
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -110,6 +110,72 @@ class HeroStatusUpdateView(LoginRequiredMixin, UpdateView):
 class HeroStatusDeleteView(LoginRequiredMixin, DeleteView):
     model = HeroStatus
     success_url = reverse_lazy('heroes:hero_status_list')
+    login_url = "/users/login/"
+
+
+#####
+
+
+class ParentListView(LoginRequiredMixin, ListView):
+    model = Parent
+    login_url = "/users/login/"
+
+
+class ParentDetailView(LoginRequiredMixin, DetailView):
+    model = Parent
+    login_url = "/users/login/"
+
+
+class ParentCreateView(LoginRequiredMixin, CreateView):
+    model = Parent
+    form_class = ParentForm
+    success_url = reverse_lazy('heroes:parent_list')
+    login_url = "/users/login/"
+
+
+class ParentUpdateView(LoginRequiredMixin, UpdateView):
+    model = Parent
+    form_class = ParentForm
+    success_url = reverse_lazy('heroes:parent_list')
+    login_url = "/users/login/"
+
+
+class ParentDeleteView(LoginRequiredMixin, DeleteView):
+    model = Parent
+    success_url = reverse_lazy('heroes:parent_list')
+    login_url = "/users/login/"
+
+
+#####
+
+
+class ParentStatusListView(LoginRequiredMixin, ListView):
+    model = ParentStatus
+    login_url = "/users/login/"
+
+
+class ParentStatusDetailView(LoginRequiredMixin, DetailView):
+    model = ParentStatus
+    login_url = "/users/login/"
+
+
+class ParentStatusCreateView(LoginRequiredMixin, CreateView):
+    model = ParentStatus
+    form_class = ParentStatusForm
+    success_url = reverse_lazy('heroes:parent_status_list')
+    login_url = "/users/login/"
+
+
+class ParentStatusUpdateView(LoginRequiredMixin, UpdateView):
+    model = ParentStatus
+    form_class = ParentStatusForm
+    success_url = reverse_lazy('heroes:parent_status_list')
+    login_url = "/users/login/"
+
+
+class ParentStatusDeleteView(LoginRequiredMixin, DeleteView):
+    model = ParentStatus
+    success_url = reverse_lazy('heroes:parent_status_list')
     login_url = "/users/login/"
 
 

@@ -3,11 +3,11 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
-from heroes.forms import HeroForm
+from heroes.forms import HeroForm, HeroStatusForm
 # Create your views here.
 
 
-from heroes.models import Hero
+from heroes.models import Hero, HeroStatus
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -66,6 +66,7 @@ class HeroCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('heroes:hero_list')
     login_url = "/users/login/"
 
+
 class HeroUpdateView(LoginRequiredMixin, UpdateView):
     model = Hero
     form_class = HeroForm
@@ -78,3 +79,38 @@ class HeroDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('heroes:hero_list')
     login_url = "/users/login/"
 
+
+#####
+
+
+class HeroStatusListView(LoginRequiredMixin, ListView):
+    model = HeroStatus
+    login_url = "/users/login/"
+
+
+class HeroStatusDetailView(LoginRequiredMixin, DetailView):
+    model = HeroStatus
+    login_url = "/users/login/"
+
+
+class HeroStatusCreateView(LoginRequiredMixin, CreateView):
+    model = HeroStatus
+    form_class = HeroStatusForm
+    success_url = reverse_lazy('heroes:hero_status_list')
+    login_url = "/users/login/"
+
+
+class HeroStatusUpdateView(LoginRequiredMixin, UpdateView):
+    model = HeroStatus
+    form_class = HeroStatusForm
+    success_url = reverse_lazy('heroes:hero_status_list')
+    login_url = "/users/login/"
+
+
+class HeroStatusDeleteView(LoginRequiredMixin, DeleteView):
+    model = HeroStatus
+    success_url = reverse_lazy('heroes:hero_status_list')
+    login_url = "/users/login/"
+
+
+#####

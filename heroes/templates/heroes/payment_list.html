@@ -2,7 +2,7 @@
 {% block content %}
 
 <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-    <h1 class="display-4">Ячейки</h1>
+    <h1 class="display-4">Платежи</h1>
     <a class="p-2 btn btn-outline-primary" href="create/">+</a>
 </div>
 
@@ -13,7 +13,8 @@
         <table class="table table-striped">
             <thead>
             <tr>
-                <th scope="col">Ячейка</th>
+                <th scope="col">Платёж</th>
+                <th scope="col">Абонемент</th>
             </tr>
             </thead>
 
@@ -21,7 +22,10 @@
             {% for object in object_list %}
             <tr>
                 <td>
-                    <a class="p-2 btn btn-outline-primary" href="/cells/{{ object.pk }}/">{{ object }}</a>
+                    <a class="p-2 btn btn-outline-primary" href="/payments/{{ object.pk }}/">{{ object }}</a>
+                </td>
+                <td>
+                    <a class="p-2 btn btn-outline-primary" href="/payment_types/{{ object.type.pk }}/">{{ object.type }}</a>
                 </td>
             </tr>
             {% endfor %}

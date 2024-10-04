@@ -1,0 +1,37 @@
+{% extends 'heroes/base.html' %}
+{% load rest_framework %}
+
+{% block content %}
+
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h1 class="display-4">{{ object }}</h1>
+    <a class="p-2 btn btn-outline-primary" href="/payment_types/{{ object.id }}/update/">Edit</a>
+    <a class="p-2 btn btn-outline-primary" href="/payment_types/{{ object.id }}/delete/">Delete</a>
+
+</div>
+
+<div class="container">
+    <div class="row text-start">
+        <div class="col-lg-9 col-md-6 col-sm-12">
+            <div class="card mb-4 box-shadow">
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <tr>
+                            <td class="w-25">Вид платежа</td>
+                            <td>{{object.title}}</td>
+                        </tr>
+                        <tr>
+                            <td class="w-25">Стоимость</td>
+                            <td>{{object.value}}</td>
+                        </tr>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

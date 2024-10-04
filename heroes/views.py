@@ -3,11 +3,12 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
-from heroes.forms import HeroForm, HeroStatusForm, ParentForm, ParentStatusForm, CellForm, TrainingForm
+from heroes.forms import HeroForm, HeroStatusForm, ParentForm, ParentStatusForm, CellForm, TrainingForm, \
+    PaymentTypeForm, PaymentForm
 # Create your views here.
 
 
-from heroes.models import Hero, HeroStatus, Parent, ParentStatus, Cell, Training
+from heroes.models import Hero, HeroStatus, Parent, ParentStatus, Cell, Training, PaymentType, Payment
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -245,6 +246,72 @@ class TrainingUpdateView(LoginRequiredMixin, UpdateView):
 class TrainingDeleteView(LoginRequiredMixin, DeleteView):
     model = Training
     success_url = reverse_lazy('heroes:training_list')
+    login_url = "/users/login/"
+
+
+#####
+
+
+class PaymentTypeListView(LoginRequiredMixin, ListView):
+    model = PaymentType
+    login_url = "/users/login/"
+
+
+class PaymentTypeDetailView(LoginRequiredMixin, DetailView):
+    model = PaymentType
+    login_url = "/users/login/"
+
+
+class PaymentTypeCreateView(LoginRequiredMixin, CreateView):
+    model = PaymentType
+    form_class = PaymentTypeForm
+    success_url = reverse_lazy('heroes:payment_type_list')
+    login_url = "/users/login/"
+
+
+class PaymentTypeUpdateView(LoginRequiredMixin, UpdateView):
+    model = PaymentType
+    form_class = PaymentTypeForm
+    success_url = reverse_lazy('heroes:payment_type_list')
+    login_url = "/users/login/"
+
+
+class PaymentTypeDeleteView(LoginRequiredMixin, DeleteView):
+    model = PaymentType
+    success_url = reverse_lazy('heroes:payment_type_list')
+    login_url = "/users/login/"
+
+
+#####
+
+
+class PaymentListView(LoginRequiredMixin, ListView):
+    model = Payment
+    login_url = "/users/login/"
+
+
+class PaymentDetailView(LoginRequiredMixin, DetailView):
+    model = Payment
+    login_url = "/users/login/"
+
+
+class PaymentCreateView(LoginRequiredMixin, CreateView):
+    model = Payment
+    form_class = PaymentForm
+    success_url = reverse_lazy('heroes:payment_list')
+    login_url = "/users/login/"
+
+
+class PaymentUpdateView(LoginRequiredMixin, UpdateView):
+    model = Payment
+    form_class = PaymentForm
+    success_url = reverse_lazy('heroes:payment_list')
+    login_url = "/users/login/"
+
+
+class PaymentDeleteView(LoginRequiredMixin, DeleteView):
+    model = Payment
+    success_url = reverse_lazy('heroes:payment_list')
     login_url = "/users/login/"
 
 

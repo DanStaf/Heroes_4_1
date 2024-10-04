@@ -44,4 +44,16 @@ urlpatterns = [
     path('trainings/<int:pk>/update/', heroes_views.TrainingUpdateView.as_view(), name='training_update'),
     path('trainings/<int:pk>/delete/', heroes_views.TrainingDeleteView.as_view(), name='training_delete'),
 
+    path('payment_types/', heroes_views.PaymentTypeListView.as_view(), name='payment_type_list'),
+    path('payment_types/<int:pk>/', heroes_views.PaymentTypeDetailView.as_view(), name='payment_type'),
+    path('payment_types/create/', heroes_views.PaymentTypeCreateView.as_view(), name='payment_type_create'),
+    path('payment_types/<int:pk>/update/', heroes_views.PaymentTypeUpdateView.as_view(), name='payment_type_update'),
+    path('payment_types/<int:pk>/delete/', heroes_views.PaymentTypeDeleteView.as_view(), name='payment_type_delete'),
+
+    path('payments/', heroes_views.PaymentListView.as_view(), name='payment_list'),
+    path('payments/<int:pk>/', heroes_views.PaymentDetailView.as_view(), name='payment'),
+    path('payments/create/', heroes_views.PaymentCreateView.as_view(), name='payment_create'),
+    path('payments/<int:pk>/update/', heroes_views.PaymentUpdateView.as_view(), name='payment_update'),
+    path('payments/<int:pk>/delete/', heroes_views.PaymentDeleteView.as_view(), name='payment_delete'),
+
 ]

@@ -3,11 +3,11 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
-from heroes.forms import HeroForm, HeroStatusForm, ParentForm, ParentStatusForm
+from heroes.forms import HeroForm, HeroStatusForm, ParentForm, ParentStatusForm, CellForm, TrainingForm
 # Create your views here.
 
 
-from heroes.models import Hero, HeroStatus, Parent, ParentStatus
+from heroes.models import Hero, HeroStatus, Parent, ParentStatus, Cell, Training
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -48,6 +48,9 @@ class HeroDetail(APIView):
             return Response({'serializer': serializer, 'object': hero})
         serializer.save()
         return redirect('heroes:hero_list')
+
+
+#####
 
 
 class HeroListView(LoginRequiredMixin, ListView):
@@ -176,6 +179,72 @@ class ParentStatusUpdateView(LoginRequiredMixin, UpdateView):
 class ParentStatusDeleteView(LoginRequiredMixin, DeleteView):
     model = ParentStatus
     success_url = reverse_lazy('heroes:parent_status_list')
+    login_url = "/users/login/"
+
+
+#####
+
+
+class CellListView(LoginRequiredMixin, ListView):
+    model = Cell
+    login_url = "/users/login/"
+
+
+class CellDetailView(LoginRequiredMixin, DetailView):
+    model = Cell
+    login_url = "/users/login/"
+
+
+class CellCreateView(LoginRequiredMixin, CreateView):
+    model = Cell
+    form_class = CellForm
+    success_url = reverse_lazy('heroes:cell_list')
+    login_url = "/users/login/"
+
+
+class CellUpdateView(LoginRequiredMixin, UpdateView):
+    model = Cell
+    form_class = CellForm
+    success_url = reverse_lazy('heroes:cell_list')
+    login_url = "/users/login/"
+
+
+class CellDeleteView(LoginRequiredMixin, DeleteView):
+    model = Cell
+    success_url = reverse_lazy('heroes:cell_list')
+    login_url = "/users/login/"
+
+
+#####
+
+
+class TrainingListView(LoginRequiredMixin, ListView):
+    model = Training
+    login_url = "/users/login/"
+
+
+class TrainingDetailView(LoginRequiredMixin, DetailView):
+    model = Training
+    login_url = "/users/login/"
+
+
+class TrainingCreateView(LoginRequiredMixin, CreateView):
+    model = Training
+    form_class = TrainingForm
+    success_url = reverse_lazy('heroes:training_list')
+    login_url = "/users/login/"
+
+
+class TrainingUpdateView(LoginRequiredMixin, UpdateView):
+    model = Training
+    form_class = TrainingForm
+    success_url = reverse_lazy('heroes:training_list')
+    login_url = "/users/login/"
+
+
+class TrainingDeleteView(LoginRequiredMixin, DeleteView):
+    model = Training
+    success_url = reverse_lazy('heroes:training_list')
     login_url = "/users/login/"
 
 

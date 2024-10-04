@@ -32,4 +32,16 @@ urlpatterns = [
     path('parents_status/<int:pk>/update/', heroes_views.ParentStatusUpdateView.as_view(), name='parent_status_update'),
     path('parents_status/<int:pk>/delete/', heroes_views.ParentStatusDeleteView.as_view(), name='parent_status_delete'),
 
+    path('cells/', heroes_views.CellListView.as_view(), name='cell_list'),
+    path('cells/<int:pk>/', heroes_views.CellDetailView.as_view(), name='cell'),
+    path('cells/create/', heroes_views.CellCreateView.as_view(), name='cell_create'),
+    path('cells/<int:pk>/update/', heroes_views.CellUpdateView.as_view(), name='cell_update'),
+    path('cells/<int:pk>/delete/', heroes_views.CellDeleteView.as_view(), name='cell_delete'),
+
+    path('trainings/', heroes_views.TrainingListView.as_view(), name='training_list'),
+    path('trainings/<int:pk>/', heroes_views.TrainingDetailView.as_view(), name='training'),
+    path('trainings/create/', heroes_views.TrainingCreateView.as_view(), name='training_create'),
+    path('trainings/<int:pk>/update/', heroes_views.TrainingUpdateView.as_view(), name='training_update'),
+    path('trainings/<int:pk>/delete/', heroes_views.TrainingDeleteView.as_view(), name='training_delete'),
+
 ]

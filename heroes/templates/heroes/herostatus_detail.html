@@ -18,7 +18,9 @@
                     <table class="table table-striped">
                         <tr>
                             <td class="w-25">Герой</td>
-                            <td>{{object.hero}}</td>
+                            <td>
+                                <a class="p-2 btn btn-outline-primary" href="/heroes/{{ object.hero.pk }}/">{{object.hero}} </a>
+                            </td>
                         </tr>
                         <tr>
                             <td class="w-25">Вид отряда</td>

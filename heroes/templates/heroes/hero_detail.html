@@ -32,7 +32,7 @@
                             <td class="w-25">Родители</td>
                             <td>
                                 {% for parent in object.parents.all %}
-                                <a class="p-2 btn btn-outline-primary" href="#">{{ parent }} </a>
+                                <a class="p-2 btn btn-outline-primary" href="/parents/{{ parent.pk }}/">{{ parent }} </a>
                                 </br>
                                 {% endfor %}
                             </td>
@@ -41,7 +41,7 @@
                             <td class="w-25">Статусы</td>
                             <td>
                                 {% for status in object.herostatus_set.all %}
-                                <a class="p-2 btn btn-outline-primary" href="#">{{ status }} </a>
+                                <a class="p-2 btn btn-outline-primary" href="/heroes_status/{{ status.pk }}/">{{ status }} </a>
                                 </br>
                                 {% endfor %}
                             </td>

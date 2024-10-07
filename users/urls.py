@@ -3,7 +3,7 @@ from django.urls import path
 # from users.views import UserViewSet
 
 from users.views import UserResetPasswordView, RegisterView, UserDeleteView, UserProfileView, UserListView, \
-    user_change_active
+    user_change_active, UserChangePasswordView
 from users.apps import UsersConfig
 
 from django.contrib.auth.views import LoginView, LogoutView
@@ -41,6 +41,8 @@ urlpatterns = [
     path('profile/', UserProfileView.as_view(), name='user-detail'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('password_reset/', UserResetPasswordView.as_view(), name='password_reset'),
+
+    path('password_change/', UserChangePasswordView.as_view(), name='password_change'),
 
     path('', UserListView.as_view(), name='user-list'),
     path('change_active/<int:pk>/', user_change_active, name='change_active'),

@@ -11,10 +11,15 @@ class RegisterForm(UserCreationForm):
 
 
 class ProfileForm(UserChangeForm):
+    extra_link = forms.URLField(
+        label="Change password",
+        widget=forms.URLInput(attrs={'style': "margin-bottom: 40px", "type": "button",
+                                     "onclick": "window.location.href='/users/password_change/'"}),
+    )
 
     class Meta:
         model = User
-        fields = ('tg_id', 'email', 'first_name', 'last_name', 'phone')
+        fields = ('tg_id', 'email', 'first_name', 'last_name', 'phone', 'extra_link')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

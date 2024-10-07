@@ -27,7 +27,7 @@ from users.models import User
 from users.forms import RegisterForm, ProfileForm
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from django.contrib.auth.forms import PasswordResetForm
-from django.contrib.auth.views import PasswordResetView
+from django.contrib.auth.views import PasswordResetView, PasswordChangeView, PasswordChangeDoneView
 
 from django.core.mail import send_mail
 from django.urls import reverse_lazy, reverse
@@ -47,12 +47,13 @@ class RegisterView(CreateView):
 
     model = User
     form_class = RegisterForm
+    success_url = reverse_lazy('users:login')
 
-    """ # token approve via email
-    
-    def form_valid(self, form):
+    # token approve via email
+    """def form_valid(self, form):
         user = form.save()
         user.is_active = False
+         
         token = secrets.token_hex(16)
         user.token = token
         user.save()
@@ -108,6 +109,7 @@ class UserResetPasswordView(PasswordResetView):
     model = User
     form_class = PasswordResetForm
     template_name = 'users/password_reset.html'
+    success_url = reverse_lazy('users:login')
 
     def form_valid(self, form):
 
@@ -125,6 +127,8 @@ class UserResetPasswordView(PasswordResetView):
 
         ### send email
 
+        # print(f'{user}: {new_password}')
+
         send_mail(
             "Heroes CRM - new password generated",
             f"Please use the below password: {new_password}",
@@ -136,10 +140,7 @@ class UserResetPasswordView(PasswordResetView):
         return redirect(reverse("users:login"))
 
 
-class UserResetPasswordDoneView(PasswordResetView):
-    model = User
-    form_class = PasswordResetForm
-    template_name = 'users/password_reset.html'
+class UserChangePasswordView(PasswordChangeView):
     success_url = reverse_lazy('users:login')
 
 
@@ -156,4 +157,3 @@ def user_change_active(request, pk):
     user.save()
 
     return redirect(reverse('users:user-list'))
-

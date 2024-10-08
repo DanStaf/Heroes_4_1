@@ -24,12 +24,38 @@ def start_message(message):
     try:
         response = User.objects.get(tg_id=message.from_user.id)
         msg = bot.send_message(message.chat.id, f'Привет, {response.first_name}')
+        offer_next_actions(message)
 
     except Exception as e:
-        create_new_user_mentor(message)
-        msg = bot.send_message(message.chat.id, f'Привет {message.from_user.first_name}, я бот Heroes-CRM. Внёс тебя в базу.')
 
-    offer_next_actions(message)
+        text_message = f'''Привет {message.from_user.first_name}, я бот Heroes-CRM.
+Для регистрации напиши свой email.'''
+
+        msg = bot.send_message(message.chat.id, text_message)
+
+        bot.register_next_step_handler(msg, input_email_and_register)
+
+
+def input_email_and_register(message):
+
+    try:
+        us = User.objects.get(email=message.text)
+
+        text_message = f'''Пользователь с таким email уже есть в базе. Напиши другой email.'''
+        msg = bot.send_message(message.chat.id, text_message)
+
+        bot.register_next_step_handler(msg, input_email_and_register)
+
+    except Exception as e:
+
+        create_new_user_mentor(message)
+
+        text_message = f'''Приятно познакомиться, {message.from_user.first_name}! Внёс тебя в базу.
+Администратор скоро одобрит заявку, и сможешь зайти на сайт.'''
+
+        msg = bot.send_message(message.chat.id, text_message)
+
+        offer_next_actions(message)
 
 
 @bot.message_handler(func=lambda message: True)

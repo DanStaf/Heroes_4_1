@@ -1,0 +1,17 @@
+<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
+
+    {% if user.is_authenticated %}
+    <nav class="ms-5">
+        <a class="p-2 btn btn-outline-primary" href="/heroes/">Герои</a>
+        <a class="p-2 btn btn-outline-primary" href="/heroes_status/">Статусы героев</a>
+        <a class="p-2 btn btn-outline-primary" href="/parents/">Родители</a>
+        <a class="p-2 btn btn-outline-primary" href="/parents_status/">Статусы родителей</a>
+        <a class="p-2 btn btn-outline-primary" href="/cells/">Ячейки</a>
+        <a class="p-2 btn btn-outline-primary" href="/trainings/">Тренировки</a>
+        <a class="p-2 btn btn-outline-primary" href="/payment_types/">Абонементы</a>
+        <a class="p-2 btn btn-outline-primary" href="/payments/">Платежи</a>
+    </nav>
+
+    {% endif %}
+
+</div>

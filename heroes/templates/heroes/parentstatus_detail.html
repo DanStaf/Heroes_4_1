@@ -1,0 +1,58 @@
+{% extends 'heroes/base.html' %}
+{% load rest_framework %}
+
+{% block content %}
+
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h1 class="display-4">{{ object }}</h1>
+    <a class="p-2 btn btn-outline-primary" href="/parents_status/{{ object.id }}/update/">Edit</a>
+    <a class="p-2 btn btn-outline-primary" href="/parents_status/{{ object.id }}/delete/">Delete</a>
+
+</div>
+
+<div class="container">
+    <div class="row text-start">
+        <div class="col-lg-9 col-md-6 col-sm-12">
+            <div class="card mb-4 box-shadow">
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <tr>
+                            <td class="w-25">Родитель</td>
+                            <td>
+                                <a class="p-2 btn btn-outline-primary" href="/parents/{{ object.parent.pk }}/">{{object.parent}} </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-25">Вид программы</td>
+                            <td>
+                                {{object.type}}
+                                {% if object.is_active %}
+                                <a class="p-2 btn btn-outline-success">Active</a>
+                                {% else %}
+                                <a class="p-2 btn btn-outline-danger">Not Active</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w-25">c</td>
+                            <td>{{object.start_from}}</td>
+                        </tr>
+                        <tr>
+                            <td class="w-25">по</td>
+                            <td>{{object.stop_at}}</td>
+                        </tr>
+                        <tr>
+                            <td class="w-25">Ячейка</td>
+                            <td>{{object.cell}}</td>
+                        </tr>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,6 +1,59 @@
 from django.urls import path, include
 from heroes.apps import HeroesConfig
+import heroes.views as heroes_views
 
 app_name = HeroesConfig.name
 
-urlpatterns = []
+urlpatterns = [
+
+    path('', heroes_views.main_view, name='home'),
+
+    path('heroes/', heroes_views.HeroListView.as_view(), name='hero_list'),
+    path('heroes/<int:pk>/', heroes_views.HeroDetailView.as_view(), name='hero'),
+    path('heroes/create/', heroes_views.HeroCreateView.as_view(), name='hero_create'),
+    path('heroes/<int:pk>/update/', heroes_views.HeroUpdateView.as_view(), name='hero_update'),
+    path('heroes/<int:pk>/delete/', heroes_views.HeroDeleteView.as_view(), name='hero_delete'),
+
+    path('heroes_status/', heroes_views.HeroStatusListView.as_view(), name='hero_status_list'),
+    path('heroes_status/<int:pk>/', heroes_views.HeroStatusDetailView.as_view(), name='hero_status'),
+    path('heroes_status/create/', heroes_views.HeroStatusCreateView.as_view(), name='hero_status_create'),
+    path('heroes_status/<int:pk>/update/', heroes_views.HeroStatusUpdateView.as_view(), name='hero_status_update'),
+    path('heroes_status/<int:pk>/delete/', heroes_views.HeroStatusDeleteView.as_view(), name='hero_status_delete'),
+
+    path('parents/', heroes_views.ParentListView.as_view(), name='parent_list'),
+    path('parents/<int:pk>/', heroes_views.ParentDetailView.as_view(), name='parent'),
+    path('parents/create/', heroes_views.ParentCreateView.as_view(), name='parent_create'),
+    path('parents/<int:pk>/update/', heroes_views.ParentUpdateView.as_view(), name='parent_update'),
+    path('parents/<int:pk>/delete/', heroes_views.ParentDeleteView.as_view(), name='parent_delete'),
+
+    path('parents_status/', heroes_views.ParentStatusListView.as_view(), name='parent_status_list'),
+    path('parents_status/<int:pk>/', heroes_views.ParentStatusDetailView.as_view(), name='parent_status'),
+    path('parents_status/create/', heroes_views.ParentStatusCreateView.as_view(), name='parent_status_create'),
+    path('parents_status/<int:pk>/update/', heroes_views.ParentStatusUpdateView.as_view(), name='parent_status_update'),
+    path('parents_status/<int:pk>/delete/', heroes_views.ParentStatusDeleteView.as_view(), name='parent_status_delete'),
+
+    path('cells/', heroes_views.CellListView.as_view(), name='cell_list'),
+    path('cells/<int:pk>/', heroes_views.CellDetailView.as_view(), name='cell'),
+    path('cells/create/', heroes_views.CellCreateView.as_view(), name='cell_create'),
+    path('cells/<int:pk>/update/', heroes_views.CellUpdateView.as_view(), name='cell_update'),
+    path('cells/<int:pk>/delete/', heroes_views.CellDeleteView.as_view(), name='cell_delete'),
+
+    path('trainings/', heroes_views.TrainingListView.as_view(), name='training_list'),
+    path('trainings/<int:pk>/', heroes_views.TrainingDetailView.as_view(), name='training'),
+    path('trainings/create/', heroes_views.TrainingCreateView.as_view(), name='training_create'),
+    path('trainings/<int:pk>/update/', heroes_views.TrainingUpdateView.as_view(), name='training_update'),
+    path('trainings/<int:pk>/delete/', heroes_views.TrainingDeleteView.as_view(), name='training_delete'),
+
+    path('payment_types/', heroes_views.PaymentTypeListView.as_view(), name='payment_type_list'),
+    path('payment_types/<int:pk>/', heroes_views.PaymentTypeDetailView.as_view(), name='payment_type'),
+    path('payment_types/create/', heroes_views.PaymentTypeCreateView.as_view(), name='payment_type_create'),
+    path('payment_types/<int:pk>/update/', heroes_views.PaymentTypeUpdateView.as_view(), name='payment_type_update'),
+    path('payment_types/<int:pk>/delete/', heroes_views.PaymentTypeDeleteView.as_view(), name='payment_type_delete'),
+
+    path('payments/', heroes_views.PaymentListView.as_view(), name='payment_list'),
+    path('payments/<int:pk>/', heroes_views.PaymentDetailView.as_view(), name='payment'),
+    path('payments/create/', heroes_views.PaymentCreateView.as_view(), name='payment_create'),
+    path('payments/<int:pk>/update/', heroes_views.PaymentUpdateView.as_view(), name='payment_update'),
+    path('payments/<int:pk>/delete/', heroes_views.PaymentDeleteView.as_view(), name='payment_delete'),
+
+]

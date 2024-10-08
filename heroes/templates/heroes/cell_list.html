@@ -1,0 +1,36 @@
+{% extends 'heroes/base.html' %}
+{% block content %}
+
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h1 class="display-4">Ячейки</h1>
+    <a class="p-2 btn btn-outline-primary" href="create/">+</a>
+</div>
+
+<div class="container">
+
+    <div class="row text-center">
+
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">Ячейка</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% for object in object_list %}
+            <tr>
+                <td>
+                    <a class="p-2 btn btn-outline-primary" href="/cells/{{ object.pk }}/">{{ object }}</a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

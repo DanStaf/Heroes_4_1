@@ -5,9 +5,12 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 def create_new_user_mentor(message):
+
     new_mentor = User.objects.create(tg_id=message.from_user.id,
+                                     email=message.text,
                                      first_name=message.from_user.first_name,
                                      last_name=message.from_user.last_name)
+    new_mentor.is_active = False
     new_mentor.set_password('12345')
     new_mentor.save()
 

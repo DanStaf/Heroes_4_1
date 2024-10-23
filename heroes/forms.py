@@ -1,6 +1,6 @@
 from django import forms
 
-from heroes.models import Hero, HeroStatus, Parent, ParentStatus, Cell, Training, PaymentType, Payment
+from heroes.models import Hero, HeroStatus, Parent, ParentStatus, Branch, Team, Training, PaymentType, Payment
 
 
 class StyleFormMixin:
@@ -42,10 +42,17 @@ class ParentStatusForm(StyleFormMixin, forms.ModelForm):
         fields = '__all__'
 
 
-class CellForm(StyleFormMixin, forms.ModelForm):
+class BranchForm(StyleFormMixin, forms.ModelForm):
 
     class Meta:
-        model = Cell
+        model = Branch
+        fields = '__all__'
+
+
+class TeamForm(StyleFormMixin, forms.ModelForm):
+
+    class Meta:
+        model = Team
         fields = '__all__'
 
 

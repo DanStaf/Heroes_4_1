@@ -32,6 +32,19 @@
                         </tr>
 
                         <tr>
+                            <td class="w-25">Герои</td>
+                            <td>
+                                {% for herostatus in object.herostatus_set.all %}
+
+                                {% if herostatus.is_active %}
+                                <a class="p-2 btn btn-outline-primary" href="/heroes/{{ herostatus.hero.pk }}/">{{ herostatus.hero }} </a>
+                                </br>
+                                {% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+
+                        <tr>
                             <td class="w-25">Тренировки</td>
                             <td>
                                 {% for training in object.training_set.all %}

@@ -27,7 +27,7 @@
                 <td>
                     {% for status in object.herostatus_set.all %}
                         {% if status.is_active %}
-                            {{ status.type }}
+                            {{ status.team }} ({{ status.team.type }})
                         {% endif %}
                     {% endfor %}
                 </td>

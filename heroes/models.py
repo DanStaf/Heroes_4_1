@@ -29,9 +29,19 @@ class Team(models.Model):
         ("вс 15:00", "вс 15:00"),
     ]
 
+    TEAM_CHOICES = [
+        ("Мощный", "Мощный"),
+        ("Отважный", "Отважный"),
+        ("Отряд мам", "Отряд мам"),
+        ("Пред.командир", "Пред.командир"),
+        ("Командир", "Командир"),
+        ("Выбыл", "Выбыл"),
+    ]
+
     branch = models.ForeignKey(Branch, verbose_name='Отделение', on_delete=models.SET_NULL, null=True, blank=True)
     day_time = models.CharField(max_length=50, choices=DT_CHOICES, verbose_name='Дата и время тренировки')
-    mentor = models.ForeignKey("heroes.Parent", verbose_name='Наставник', on_delete=models.SET_NULL, null=True, blank=True)
+    mentor = models.ForeignKey("heroes.Parent", verbose_name='Наставник/Вожатая', on_delete=models.SET_NULL, null=True, blank=True)
+    type = models.CharField(max_length=50, choices=TEAM_CHOICES, verbose_name='Вид отряда')
 
     def __str__(self):
         return f'{self.branch} {self.day_time} {self.mentor.surname}'
@@ -165,24 +175,14 @@ class ParentStatus(models.Model):
 
 class HeroStatus(models.Model):
 
-    TEAM_CHOICES = [
-        ("Мощный", "Мощный"),
-        ("Отважный", "Отважный"),
-        ("Отряд мам", "Отряд мам"),
-        ("Пред.командир", "Пред.командир"),
-        ("Командир", "Командир"),
-        ("Выбыл", "Выбыл"),
-    ]
-
     hero = models.ForeignKey(Hero, verbose_name='Герой', on_delete=models.CASCADE)
-    type = models.CharField(max_length=50, choices=TEAM_CHOICES, verbose_name='Вид отряда')
     start_from = models.DateField(verbose_name='с')
     stop_at = models.DateField(verbose_name='по', null=True, blank=True)
     team = models.ForeignKey(Team, verbose_name='Отряд', on_delete=models.SET_NULL, null=True, blank=True)
     # mentor = models.ForeignKey(Parent, verbose_name='Наставник', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return f'{self.hero} ({self.type}) {"+" if self.is_active() else "-"}'
+        return f'{self.hero} ({self.team.type}) {"+" if self.is_active() else "-"}'
 
     def is_active(self):
         today = datetime.datetime.now().date()

@@ -348,7 +348,7 @@ def start_attendance_poll(message, training_date):
     poll_structure = {'id': msg.poll.id,
                       'date': training_date,
                       'options': [item for item in data],
-                      'cell_name': team_name
+                      'team_name': team_name
                       }
 
     actual_polls.append(poll_structure)
@@ -366,12 +366,13 @@ def user_poll_input(poll_answer):
 
     mentor = Parent.objects.get(phone=user.phone)
 
-    print(poll)
-    print(poll['team_name'][:-9])
-    print(poll['team_name'][-8:])
+    # 'team_name': 'Москва. Одинцово вс 09:00 Стафеев'
+    branch_dt = ' '.join(poll['team_name'].split(' ')[:-1])
+    branch = Branch.objects.get(location=branch_dt[:-9])
+    day_time = branch_dt[-8:]
 
-    # need to check!
-    team = Team.objects.get(location=poll['team_name'][:-9], day_time=poll['team_name'][-8:])
+    # checked
+    team = Team.objects.get(branch=branch, day_time=day_time)
 
     # print(f'answers: {poll_answer.option_ids}')
     # print(f'options: {poll['options']}')

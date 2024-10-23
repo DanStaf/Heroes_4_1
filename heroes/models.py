@@ -29,12 +29,12 @@ class Team(models.Model):
         ("вс 15:00", "вс 15:00"),
     ]
 
-    branch = models.ForeignKey(Branch, verbose_name='Отделение', on_delete=models.SET_NULL)
+    branch = models.ForeignKey(Branch, verbose_name='Отделение', on_delete=models.SET_NULL, null=True, blank=True)
     day_time = models.CharField(max_length=50, choices=DT_CHOICES, verbose_name='Дата и время тренировки')
-    mentor = models.ForeignKey("heroes.Parent", verbose_name='Наставник', on_delete=models.SET_NULL)
+    mentor = models.ForeignKey("heroes.Parent", verbose_name='Наставник', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f'{self.branch} {self.day_time}'
+        return f'{self.branch} {self.day_time} {self.mentor.surname}'
 
     class Meta:
         verbose_name = 'отряд'
@@ -195,7 +195,7 @@ class HeroStatus(models.Model):
 
 class Training(models.Model):
 
-    mentor = models.ForeignKey(Parent, verbose_name='Наставник', on_delete=models.SET_NULL)
+    mentor = models.ForeignKey(Parent, verbose_name='Наставник', on_delete=models.SET_NULL, null=True, blank=True)
     date = models.DateField(verbose_name='Дата тренировки')
     team = models.ForeignKey(Team, verbose_name='Отряд', on_delete=models.SET_NULL, null=True, blank=True)
 

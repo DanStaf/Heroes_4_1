@@ -1,5 +1,5 @@
 from users.models import User
-from heroes.models import Cell
+from heroes.models import Team
 import datetime
 from PIL import Image, ImageDraw, ImageFont
 
@@ -43,8 +43,8 @@ def get_4_last_training_dates(my_format="%d.%m.%Y"):
         return [item.strftime(my_format) for item in sundays]
 
 
-def get_cells():
-    return [str(item) for item in Cell.objects.all()]
+def get_teams():
+    return [str(item) for item in Team.objects.all()]
 
 
 def create_image(my_data: list):
@@ -78,5 +78,3 @@ def create_image(my_data: list):
     image.save(filename)
 
     return filename
-
-

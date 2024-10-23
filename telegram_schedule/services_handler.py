@@ -1,10 +1,10 @@
 import os
 import psycopg2
 
-from heroes.models import Hero, Training, Cell, Parent
+from heroes.models import Hero, Training, Branch, Team, Parent
 from users.models import User
 
-from telegram_schedule.services_connector import create_new_user_mentor, get_4_last_training_dates, get_cells, \
+from telegram_schedule.services_connector import create_new_user_mentor, get_4_last_training_dates, get_teams, \
     create_image, user_set_staff
 
 from config.settings import TG_API_TOKEN, DATABASES
@@ -130,8 +130,8 @@ def add_options_keyboard(next_key=None):
                        ]
     elif next_key == 'date_':
         buttons = get_4_last_training_dates()
-    elif next_key == 'cell_':
-        buttons = get_cells()
+    elif next_key == 'team_':
+        buttons = get_teams()
     else:
         buttons = None
 
@@ -267,7 +267,7 @@ def chose_action(message):
                                         f'Выберите дату:',
                                         reply_markup=add_options_keyboard("date_"))
 
-            bot.register_next_step_handler(msg, chose_cell)
+            bot.register_next_step_handler(msg, chose_team)
 
             flag = False
             # bot.send_message(message.chat.id, "Действие пока не реализовано")
@@ -314,11 +314,11 @@ def chose_action(message):
 ################
 
 
-def chose_cell(message):
+def chose_team(message):
 
     msg = bot.send_message(message.chat.id,
-                           f'Выберите ячейку:',
-                           reply_markup=add_options_keyboard("cell_"))
+                           f'Выберите отряд:',
+                           reply_markup=add_options_keyboard("team_"))
 
     training_date = message.text
     bot.register_next_step_handler(msg, start_attendance_poll, training_date)
@@ -327,7 +327,7 @@ def chose_cell(message):
 def start_attendance_poll(message, training_date):
     data = Hero.objects.all()
 
-    cell_name = message.text
+    team_name = message.text
 
     """options = [
         {'text': str(item), 'voter_count': 0} for item in data
@@ -348,7 +348,7 @@ def start_attendance_poll(message, training_date):
     poll_structure = {'id': msg.poll.id,
                       'date': training_date,
                       'options': [item for item in data],
-                      'cell_name': cell_name
+                      'cell_name': team_name
                       }
 
     actual_polls.append(poll_structure)
@@ -362,8 +362,16 @@ def user_poll_input(poll_answer):
     poll = actual_polls[poll_id]
 
     user = User.objects.get(tg_id=poll_answer.user.id)
+
+
     mentor = Parent.objects.get(phone=user.phone)
-    cell = Cell.objects.get(location=poll['cell_name'][:-9], day_time=poll['cell_name'][-8:])
+
+    print(poll)
+    print(poll['team_name'][:-9])
+    print(poll['team_name'][-8:])
+
+    # need to check!
+    team = Team.objects.get(location=poll['team_name'][:-9], day_time=poll['team_name'][-8:])
 
     # print(f'answers: {poll_answer.option_ids}')
     # print(f'options: {poll['options']}')
@@ -375,7 +383,7 @@ def user_poll_input(poll_answer):
 
     tr = Training.objects.create(mentor=mentor,
                                  date=get_date_format(poll['date']),
-                                 cell=cell
+                                 team=team
                                  )
     tr.heroes.add(*heroes)
     tr.save()
@@ -407,11 +415,11 @@ def get_attendance():
         "password": DATABASES['default']['PASSWORD']
     }
 
-    cells = Cell.objects.all()
+    teams = Team.objects.all()
 
     total_result = []
 
-    for cell in cells:
+    for team in teams:
 
         query = """
                         SELECT
@@ -435,7 +443,7 @@ def get_attendance():
                           true as training_date
                         FROM heroes_training_heroes A
                         INNER JOIN heroes_training T on A.training_id = T.id
-                        WHERE T.date = '{one_date}' and T.cell_id = {cell.id}) as S{index}
+                        WHERE T.date = '{one_date}' and T.team_id = {team.id}) as S{index}
                         on heroes_hero.id = S{index}.hero_id
                         """
 
@@ -449,7 +457,7 @@ def get_attendance():
 
                 result = cur.fetchall()
 
-        result.insert(0, (str(cell), ))
+        result.insert(0, (str(team), ))
 
         total_result.extend(result)
 

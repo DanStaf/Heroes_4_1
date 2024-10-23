@@ -3,12 +3,10 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
-from heroes.forms import HeroForm, HeroStatusForm, ParentForm, ParentStatusForm, CellForm, TrainingForm, \
+from heroes.forms import HeroForm, HeroStatusForm, ParentForm, ParentStatusForm, BranchForm, TeamForm, TrainingForm, \
     PaymentTypeForm, PaymentForm
-# Create your views here.
 
-
-from heroes.models import Hero, HeroStatus, Parent, ParentStatus, Cell, Training, PaymentType, Payment
+from heroes.models import Hero, HeroStatus, Parent, ParentStatus, Branch, Team, Training, PaymentType, Payment
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -186,33 +184,66 @@ class ParentStatusDeleteView(LoginRequiredMixin, DeleteView):
 #####
 
 
-class CellListView(LoginRequiredMixin, ListView):
-    model = Cell
+class BranchListView(LoginRequiredMixin, ListView):
+    model = Branch
     login_url = "/users/login/"
 
 
-class CellDetailView(LoginRequiredMixin, DetailView):
-    model = Cell
+class BranchDetailView(LoginRequiredMixin, DetailView):
+    model = Branch
     login_url = "/users/login/"
 
 
-class CellCreateView(LoginRequiredMixin, CreateView):
-    model = Cell
-    form_class = CellForm
-    success_url = reverse_lazy('heroes:cell_list')
+class BranchCreateView(LoginRequiredMixin, CreateView):
+    model = Branch
+    form_class = BranchForm
+    success_url = reverse_lazy('heroes:branch_list')
     login_url = "/users/login/"
 
 
-class CellUpdateView(LoginRequiredMixin, UpdateView):
-    model = Cell
-    form_class = CellForm
-    success_url = reverse_lazy('heroes:cell_list')
+class BranchUpdateView(LoginRequiredMixin, UpdateView):
+    model = Branch
+    form_class = BranchForm
+    success_url = reverse_lazy('heroes:branch_list')
     login_url = "/users/login/"
 
 
-class CellDeleteView(LoginRequiredMixin, DeleteView):
-    model = Cell
-    success_url = reverse_lazy('heroes:cell_list')
+class BranchDeleteView(LoginRequiredMixin, DeleteView):
+    model = Branch
+    success_url = reverse_lazy('heroes:branch_list')
+    login_url = "/users/login/"
+
+
+#####
+
+
+class TeamListView(LoginRequiredMixin, ListView):
+    model = Team
+    login_url = "/users/login/"
+
+
+class TeamDetailView(LoginRequiredMixin, DetailView):
+    model = Team
+    login_url = "/users/login/"
+
+
+class TeamCreateView(LoginRequiredMixin, CreateView):
+    model = Team
+    form_class = TeamForm
+    success_url = reverse_lazy('heroes:team_list')
+    login_url = "/users/login/"
+
+
+class TeamUpdateView(LoginRequiredMixin, UpdateView):
+    model = Team
+    form_class = TeamForm
+    success_url = reverse_lazy('heroes:team_list')
+    login_url = "/users/login/"
+
+
+class TeamDeleteView(LoginRequiredMixin, DeleteView):
+    model = Team
+    success_url = reverse_lazy('heroes:team_list')
     login_url = "/users/login/"
 
 

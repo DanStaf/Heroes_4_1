@@ -32,11 +32,17 @@ urlpatterns = [
     path('parents_status/<int:pk>/update/', heroes_views.ParentStatusUpdateView.as_view(), name='parent_status_update'),
     path('parents_status/<int:pk>/delete/', heroes_views.ParentStatusDeleteView.as_view(), name='parent_status_delete'),
 
-    path('cells/', heroes_views.CellListView.as_view(), name='cell_list'),
-    path('cells/<int:pk>/', heroes_views.CellDetailView.as_view(), name='cell'),
-    path('cells/create/', heroes_views.CellCreateView.as_view(), name='cell_create'),
-    path('cells/<int:pk>/update/', heroes_views.CellUpdateView.as_view(), name='cell_update'),
-    path('cells/<int:pk>/delete/', heroes_views.CellDeleteView.as_view(), name='cell_delete'),
+    path('branches/', heroes_views.BranchListView.as_view(), name='branch_list'),
+    path('branches/<int:pk>/', heroes_views.BranchDetailView.as_view(), name='branch'),
+    path('branches/create/', heroes_views.BranchCreateView.as_view(), name='branch_create'),
+    path('branches/<int:pk>/update/', heroes_views.BranchUpdateView.as_view(), name='branch_update'),
+    path('branches/<int:pk>/delete/', heroes_views.BranchDeleteView.as_view(), name='branch_delete'),
+
+    path('teams/', heroes_views.TeamListView.as_view(), name='team_list'),
+    path('teams/<int:pk>/', heroes_views.TeamDetailView.as_view(), name='team'),
+    path('teams/create/', heroes_views.TeamCreateView.as_view(), name='team_create'),
+    path('teams/<int:pk>/update/', heroes_views.TeamUpdateView.as_view(), name='team_update'),
+    path('teams/<int:pk>/delete/', heroes_views.TeamDeleteView.as_view(), name='team_delete'),
 
     path('trainings/', heroes_views.TrainingListView.as_view(), name='training_list'),
     path('trainings/<int:pk>/', heroes_views.TrainingDetailView.as_view(), name='training'),

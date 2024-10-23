@@ -1,18 +1,33 @@
 from users.models import User
-from heroes.models import Cell
+from heroes.models import Team, Parent
 import datetime
 from PIL import Image, ImageDraw, ImageFont
 
 
-def create_new_user_mentor(message):
+def create_new_user_mentor(message, phone, email):
 
     new_mentor = User.objects.create(tg_id=message.from_user.id,
-                                     email=message.text,
+                                     email=email,
+                                     phone=phone,
                                      first_name=message.from_user.first_name,
                                      last_name=message.from_user.last_name)
     new_mentor.is_active = False
     new_mentor.set_password('12345')
     new_mentor.save()
+
+    try:
+        pa = Parent.objects.get(phone=phone)
+
+    except Exception as e:
+
+        # Пока добавляем только наставников, не вожатых.
+        # Можно будет добавить пункт при регистрации.
+
+        new_parent = Parent.objects.create(phone=phone,
+                                           name=message.from_user.first_name,
+                                           surname=message.from_user.last_name,
+                                           sex=Parent.DAD)
+        new_parent.save()
 
 
 def user_set_staff(tg_id):
@@ -43,8 +58,8 @@ def get_4_last_training_dates(my_format="%d.%m.%Y"):
         return [item.strftime(my_format) for item in sundays]
 
 
-def get_cells():
-    return [str(item) for item in Cell.objects.all()]
+def get_teams():
+    return [str(item) for item in Team.objects.all()]
 
 
 def create_image(my_data: list):
@@ -78,5 +93,3 @@ def create_image(my_data: list):
     image.save(filename)
 
     return filename
-
-

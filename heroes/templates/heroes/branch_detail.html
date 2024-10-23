@@ -5,8 +5,8 @@
 
 <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
     <h1 class="display-4">{{ object }}</h1>
-    <a class="p-2 btn btn-outline-primary" href="/trainings/{{ object.id }}/update/">Edit</a>
-    <a class="p-2 btn btn-outline-primary" href="/trainings/{{ object.id }}/delete/">Delete</a>
+    <a class="p-2 btn btn-outline-primary" href="/branches/{{ object.id }}/update/">Edit</a>
+    <a class="p-2 btn btn-outline-primary" href="/branches/{{ object.id }}/delete/">Delete</a>
 
 </div>
 
@@ -17,22 +17,19 @@
                 <div class="card-body">
                     <table class="table table-striped">
                         <tr>
-                            <td class="w-25">Отряд</td>
-                            <td>{{object.team}}</td>
+                            <td class="w-25">Город (локация)</td>
+                            <td>{{object.location}}</td>
                         </tr>
                         <tr>
-                            <td class="w-25">Дата</td>
-                            <td>{{object.date}}</td>
+                            <td class="w-25">Старший</td>
+                            <td>{{object.head}}</td>
                         </tr>
+
                         <tr>
-                            <td class="w-25">Наставник</td>
-                            <td>{{object.mentor}}</td>
-                        </tr>
-                        <tr>
-                            <td class="w-25">Герои</td>
+                            <td class="w-25">Отряды</td>
                             <td>
-                                {% for hero in object.heroes.all %}
-                                <a class="p-2 btn btn-outline-primary" href="/heroes/{{ hero.pk }}/">{{ hero }} </a>
+                                {% for team in object.team_set.all %}
+                                <a class="p-2 btn btn-outline-primary" href="/teams/{{ team.pk }}/">{{ team }} </a>
                                 </br>
                                 {% endfor %}
                             </td>

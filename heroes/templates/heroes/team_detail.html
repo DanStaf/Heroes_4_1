@@ -5,8 +5,8 @@
 
 <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
     <h1 class="display-4">{{ object }}</h1>
-    <a class="p-2 btn btn-outline-primary" href="/cells/{{ object.id }}/update/">Edit</a>
-    <a class="p-2 btn btn-outline-primary" href="/cells/{{ object.id }}/delete/">Delete</a>
+    <a class="p-2 btn btn-outline-primary" href="/teams/{{ object.id }}/update/">Edit</a>
+    <a class="p-2 btn btn-outline-primary" href="/teams/{{ object.id }}/delete/">Delete</a>
 
 </div>
 
@@ -17,12 +17,31 @@
                 <div class="card-body">
                     <table class="table table-striped">
                         <tr>
-                            <td class="w-25">Город (локация)</td>
-                            <td>{{object.location}}</td>
+                            <td class="w-25">Отделение</td>
+                            <td>
+                            <a class="p-2 btn btn-outline-primary" href="/branches/{{ object.branch.pk }}/">{{object.branch}} </a>
+                            </td>
                         </tr>
                         <tr>
                             <td class="w-25">Дата и время тренировки</td>
                             <td>{{object.day_time}}</td>
+                        </tr>
+                        <tr>
+                            <td class="w-25">Наставник</td>
+                            <td>{{object.mentor}}</td>
+                        </tr>
+
+                        <tr>
+                            <td class="w-25">Герои</td>
+                            <td>
+                                {% for herostatus in object.herostatus_set.all %}
+
+                                {% if herostatus.is_active %}
+                                <a class="p-2 btn btn-outline-primary" href="/heroes/{{ herostatus.hero.pk }}/">{{ herostatus.hero }} </a>
+                                </br>
+                                {% endif %}
+                                {% endfor %}
+                            </td>
                         </tr>
 
                         <tr>

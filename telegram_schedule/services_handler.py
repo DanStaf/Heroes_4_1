@@ -29,26 +29,49 @@ def start_message(message):
     except Exception as e:
 
         text_message = f'''Привет {message.from_user.first_name}, я бот Heroes-CRM.
-Для регистрации напиши свой email.'''
+Для регистрации напиши свой телефон:'''
 
         msg = bot.send_message(message.chat.id, text_message)
 
-        bot.register_next_step_handler(msg, input_email_and_register)
+        bot.register_next_step_handler(msg, input_phone_ask_email)
 
 
-def input_email_and_register(message):
+def input_phone_ask_email(message):
+
+    phone = message.text
 
     try:
-        us = User.objects.get(email=message.text)
+        us = User.objects.get(phone=phone)
+
+        text_message = f'''Пользователь с таким телефоном уже есть в базе. Напиши другой телефон.'''
+        msg = bot.send_message(message.chat.id, text_message)
+
+        bot.register_next_step_handler(msg, input_phone_ask_email)
+
+    except Exception as e:
+
+        text_message = f'''Ещё напиши пожалуйста твой email:'''
+
+        msg = bot.send_message(message.chat.id, text_message)
+
+        bot.register_next_step_handler(msg, input_email_and_register, phone=phone)
+
+
+def input_email_and_register(message, phone):
+
+    email = message.text
+
+    try:
+        us = User.objects.get(email=email)
 
         text_message = f'''Пользователь с таким email уже есть в базе. Напиши другой email.'''
         msg = bot.send_message(message.chat.id, text_message)
 
-        bot.register_next_step_handler(msg, input_email_and_register)
+        bot.register_next_step_handler(msg, input_email_and_register, phone=phone)
 
     except Exception as e:
 
-        create_new_user_mentor(message)
+        create_new_user_mentor(message, phone, email)
 
         text_message = f'''Приятно познакомиться, {message.from_user.first_name}! Внёс тебя в базу.
 Администратор скоро одобрит заявку, и сможешь зайти на сайт.'''
@@ -363,7 +386,7 @@ def user_poll_input(poll_answer):
 
     user = User.objects.get(tg_id=poll_answer.user.id)
 
-
+    ### not good!
     mentor = Parent.objects.get(phone=user.phone)
 
     # 'team_name': 'Москва. Одинцово вс 09:00 Стафеев'

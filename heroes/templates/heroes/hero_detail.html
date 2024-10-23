@@ -29,6 +29,10 @@
                             <td>{{object.birth_date}}</td>
                         </tr>
                         <tr>
+                            <td class="w-25">Телефон (для командиров)</td>
+                            <td>{{object.phone}}</td>
+                        </tr>
+                        <tr>
                             <td class="w-25">Родители</td>
                             <td>
                                 {% for parent in object.parents.all %}

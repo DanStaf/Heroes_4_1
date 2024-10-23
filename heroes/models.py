@@ -129,6 +129,7 @@ photo
     surname = models.CharField(max_length=50, verbose_name='Фамилия')
     sex = models.CharField(max_length=50, choices=HERO_CHOICES, verbose_name='Пол')
     birth_date = models.DateField(verbose_name='Дата рождения')
+    phone = models.PositiveBigIntegerField(verbose_name='Телефон', null=True, blank=True)
 
     parents = models.ManyToManyField(Parent, verbose_name='Родители')
 

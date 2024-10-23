@@ -367,12 +367,14 @@ def user_poll_input(poll_answer):
     mentor = Parent.objects.get(phone=user.phone)
 
     # 'team_name': 'Москва. Одинцово вс 09:00 Стафеев'
-    branch_dt = ' '.join(poll['team_name'].split(' ')[:-1])
+    split_text = poll['team_name'].split(' ')
+    branch_dt = ' '.join(split_text[:-1])
     branch = Branch.objects.get(location=branch_dt[:-9])
     day_time = branch_dt[-8:]
+    team_mentor = Parent.objects.get(surname=split_text[-1])
 
     # checked
-    team = Team.objects.get(branch=branch, day_time=day_time)
+    team = Team.objects.get(branch=branch, day_time=day_time, mentor=team_mentor)
 
     # print(f'answers: {poll_answer.option_ids}')
     # print(f'options: {poll['options']}')

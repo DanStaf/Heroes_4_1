@@ -3,7 +3,49 @@ import datetime
 from django.db import models
 
 
-class Cell(models.Model):
+class Branch(models.Model):
+    # branch отделение
+    # при удалении не должны удаляться статусы и тренировки
+
+    location = models.CharField(max_length=50, verbose_name='Город (локация)')
+    head = models.ForeignKey("heroes.Parent", verbose_name='Старший', on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.location}'
+
+    class Meta:
+        verbose_name = 'отделение'
+        verbose_name_plural = 'отделения'
+
+
+class Team(models.Model):
+    # team отряд
+    # при удалении не должны удаляться статусы и тренировки
+
+    DT_CHOICES = [
+        ("сб 09:00", "сб 09:00"),
+        ("сб 15:00", "сб 15:00"),
+        ("вс 09:00", "вс 09:00"),
+        ("вс 15:00", "вс 15:00"),
+    ]
+
+    branch = models.ForeignKey(Branch, verbose_name='Отделение', on_delete=models.SET_NULL)
+    day_time = models.CharField(max_length=50, choices=DT_CHOICES, verbose_name='Дата и время тренировки')
+    mentor = models.ForeignKey("heroes.Parent", verbose_name='Наставник', on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return f'{self.branch} {self.day_time}'
+
+    class Meta:
+        verbose_name = 'отряд'
+        verbose_name_plural = 'отряды'
+
+
+"""class Cell(models.Model):
+    # branch отделение
+    # team отряд / troop, group, band, , unit
+
+    # при удалении ячейки удалены статусы и тренировки
 
     DT_CHOICES = [
         ("сб 09:00", "сб 09:00"),
@@ -21,6 +63,7 @@ class Cell(models.Model):
     class Meta:
         verbose_name = 'ячейка'
         verbose_name_plural = 'ячейки'
+"""
 
 
 class Parent(models.Model):
@@ -106,7 +149,7 @@ class ParentStatus(models.Model):
     type = models.CharField(max_length=50, choices=PROGRAM_CHOICES, verbose_name='Вид программы')
     start_from = models.DateField(verbose_name='с')
     stop_at = models.DateField(verbose_name='по', null=True, blank=True)
-    cell = models.ForeignKey(Cell, verbose_name='Ячейка', on_delete=models.CASCADE, null=True, blank=True)
+    branch = models.ForeignKey(Branch, verbose_name='Отделение', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return f'{self.parent} ({self.type}) {"+" if self.is_active() else "-"}'
@@ -135,8 +178,8 @@ class HeroStatus(models.Model):
     type = models.CharField(max_length=50, choices=TEAM_CHOICES, verbose_name='Вид отряда')
     start_from = models.DateField(verbose_name='с')
     stop_at = models.DateField(verbose_name='по', null=True, blank=True)
-    cell = models.ForeignKey(Cell, verbose_name='Ячейка', on_delete=models.CASCADE, null=True, blank=True)
-    mentor = models.ForeignKey(Parent, verbose_name='Наставник', on_delete=models.CASCADE, null=True, blank=True)
+    team = models.ForeignKey(Team, verbose_name='Отряд', on_delete=models.SET_NULL, null=True, blank=True)
+    # mentor = models.ForeignKey(Parent, verbose_name='Наставник', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f'{self.hero} ({self.type}) {"+" if self.is_active() else "-"}'
@@ -152,16 +195,16 @@ class HeroStatus(models.Model):
 
 class Training(models.Model):
 
-    mentor = models.ForeignKey(Parent, verbose_name='Наставник', on_delete=models.CASCADE)
+    mentor = models.ForeignKey(Parent, verbose_name='Наставник', on_delete=models.SET_NULL)
     date = models.DateField(verbose_name='Дата тренировки')
-    cell = models.ForeignKey(Cell, verbose_name='Ячейка', on_delete=models.CASCADE, null=True, blank=True)
+    team = models.ForeignKey(Team, verbose_name='Отряд', on_delete=models.SET_NULL, null=True, blank=True)
 
     heroes = models.ManyToManyField(Hero, verbose_name='Явка героев')
 
     # comments ?
 
     def __str__(self):
-        return f'Тренировка: {self.date} {self.cell}'
+        return f'Тренировка: {self.date} {self.team}'
 
     class Meta:
         verbose_name = 'тренировка'

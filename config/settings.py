@@ -73,11 +73,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.getenv('DATABASE_NAME'),  # Название БД
-        'USER': os.getenv('DATABASE_USER'),  # Пользователь для подключения
-        'PASSWORD': os.getenv('DATABASE_PASSWORD'),  # Пароль для этого пользователя
-        'HOST': os.getenv('DATABASE_HOST'),  # Адрес, на котором развернут сервер БД
-        'PORT': os.getenv('DATABASE_PORT'),
+        'NAME': os.getenv('POSTGRES_DB'),  # Название БД
+        'USER': os.getenv('POSTGRES_USER'),  # Пользователь для подключения
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),  # Пароль для этого пользователя
+        'HOST': os.getenv('POSTGRES_HOST'),  # Адрес, на котором развернут сервер БД
+        'PORT': os.getenv('POSTGRES_PORT'),
     }
 }
 

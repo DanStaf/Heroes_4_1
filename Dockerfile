@@ -8,6 +8,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt --no-cache-dir
 COPY . .
+# RUN python manage.py collectstatic
 
 # Команда для запуска Django-сервера
 # CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

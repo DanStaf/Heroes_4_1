@@ -2,6 +2,7 @@ from users.models import User
 from heroes.models import Team, Parent
 import datetime
 from PIL import Image, ImageDraw, ImageFont
+from config.settings import FONT_PATH
 
 
 def create_new_user_mentor(message, phone, email):
@@ -72,7 +73,8 @@ def create_image(my_data: list):
     y_size = len(my_data) * (font_size + interval) + fields * 2
 
     image = Image.new('RGB', (x_size, y_size), 'white')
-    font = ImageFont.truetype("arial.ttf", font_size)
+
+    font = ImageFont.truetype(FONT_PATH, font_size)
 
     drawer = ImageDraw.Draw(image)
     y = fields

@@ -116,7 +116,19 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+# из этих папок собираются файлы в STATIC_ROOT
+#STATICFILES_DIRS = (
+#    os.path.join(BASE_DIR, 'heroes', 'static'),
+#    os.path.join(BASE_DIR, 'users', 'static'),
+#    os.path.join(BASE_DIR, 'telegram_schedule', 'static'),
+#)
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# доступ к файлам по урл
+STATIC_URL = '/static/'
+
+FONT_PATH = os.path.join(BASE_DIR, 'static', 'arial.ttf')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

@@ -128,6 +128,10 @@ def add_options_keyboard(next_key=None):
         buttons = ["м",
                        "ж"
                        ]
+    elif next_key == "yn":
+        buttons = ["Да",
+                   "Нет"
+                   ]
     elif next_key == "new" or next_key == "profile" or next_key == "feedback":
         buttons = ["True",
                        "False"
@@ -356,26 +360,38 @@ def start_attendance_poll(message, training_date):
         {'text': str(item), 'voter_count': 0} for item in data
     ]"""
     options = [str(item) for item in data]
-    # print(options)
 
-    msg = bot.send_poll(message.chat.id,
-                        f"Явка за {training_date}:",
-                        options=options,
-                        type='regular',
-                        allows_multiple_answers=True,
-                        is_anonymous=False,
-                        reply_markup=add_options_keyboard()
-                        )
-    bot.register_next_step_handler(msg, chose_action)
+    if not options:
+        msg = bot.send_message(message.chat.id, 'There are no Heroes')
 
-    poll_structure = {'id': msg.poll.id,
-                      'date': training_date,
-                      'options': [item for item in data],
-                      'team_name': team_name
-                      }
+    elif len(options) == 1:
+        msg = bot.send_message(message.chat.id,
+                               f"Явка за {training_date}: {options[0]}",
+                               reply_markup=add_options_keyboard("yn"))
 
-    actual_polls.append(poll_structure)
-    # print(actual_polls)
+        bot.register_next_step_handler(msg, set_attendance_of_one_hero, data[0], training_date, team_name)
+
+    else:
+
+        msg = bot.send_poll(message.chat.id,
+                            f"Явка за {training_date}:",
+                            options=options,
+                            type='regular',
+                            allows_multiple_answers=True,
+                            is_anonymous=False,
+                            reply_markup=add_options_keyboard()
+                            )
+
+        poll_structure = {'id': msg.poll.id,
+                          'date': training_date,
+                          'options': [item for item in data],
+                          'team_name': team_name
+                          }
+
+        actual_polls.append(poll_structure)
+        # print(actual_polls)
+
+        bot.register_next_step_handler(msg, chose_action)
 
 
 def user_poll_input(poll_answer):
@@ -384,39 +400,22 @@ def user_poll_input(poll_answer):
     poll_id = ids.index(poll_answer.poll_id)
     poll = actual_polls[poll_id]
 
-    user = User.objects.get(tg_id=poll_answer.user.id)
-
-    ### not good!
-    mentor = Parent.objects.get(phone=user.phone)
-
-    # 'team_name': 'Москва. Одинцово вс 09:00 Стафеев'
-    split_text = poll['team_name'].split(' ')
-    branch_dt = ' '.join(split_text[:-1])
-    branch = Branch.objects.get(location=branch_dt[:-9])
-    day_time = branch_dt[-8:]
-    team_mentor = Parent.objects.get(surname=split_text[-1])
-
-    # checked
-    team = Team.objects.get(branch=branch, day_time=day_time, mentor=team_mentor)
-
-    # print(f'answers: {poll_answer.option_ids}')
-    # print(f'options: {poll['options']}')
-
     heroes = []
     for index, hero in enumerate(poll['options']):
         if index in poll_answer.option_ids:
             heroes.append(hero)
 
-    tr = Training.objects.create(mentor=mentor,
-                                 date=get_date_format(poll['date']),
-                                 team=team
-                                 )
-    tr.heroes.add(*heroes)
-    tr.save()
+    # print(f'answers: {poll_answer.option_ids}')
+    # print(f'options: {poll['options']}')
+
+    len_heroes = create_training(poll['team_name'],
+                                 poll_answer.user.id,
+                                 poll['date'],
+                                 heroes)
 
     actual_polls.remove(poll)
 
-    bot.send_message(poll_answer.user.id, f'{len(heroes)} героев отмечены')
+    bot.send_message(poll_answer.user.id, f'{len_heroes} героев отмечены')
 
 
 def get_date_format(text_date):
@@ -476,6 +475,9 @@ def get_attendance():
         query += """
                         order by heroes_hero.id
                         """
+
+        # ERROR - TeleBot: "Infinity polling exception: cannot open resource"
+        # line 304, in chose_action image_filename = get_attendance()
 
         with psycopg2.connect(**conn_params) as conn:
             with conn.cursor() as cur:
@@ -553,3 +555,51 @@ def get_attendance_2():
     image_filename = create_image(my_data)
 
     return image_filename
+
+
+def set_attendance_of_one_hero(message, hero, date, team_name):
+
+    if message.text == 'Да':
+
+        create_training(team_name,
+                        message.chat.id,
+                        date,
+                        [hero.id])
+
+        msg = bot.send_message(message.chat.id,
+                               f'1 герой отмечен',
+                               reply_markup=add_options_keyboard())
+
+    else:
+        msg = bot.send_message(message.chat.id,
+                               f'0 героев отмечены',
+                               reply_markup=add_options_keyboard())
+
+    bot.register_next_step_handler(msg, chose_action)
+
+
+def create_training(team_name, tg_id, date, heroes):
+
+    user = User.objects.get(tg_id=tg_id)
+
+    ### not good!
+    mentor = Parent.objects.get(phone=user.phone)
+
+    # 'team_name': 'Москва. Одинцово вс 09:00 Стафеев'
+    split_text = team_name.split(' ')
+    branch_dt = ' '.join(split_text[:-1])
+    branch = Branch.objects.get(location=branch_dt[:-9])
+    day_time = branch_dt[-8:]
+    team_mentor = Parent.objects.get(surname=split_text[-1])
+
+    # checked
+    team = Team.objects.get(branch=branch, day_time=day_time, mentor=team_mentor)
+
+    tr = Training.objects.create(mentor=mentor,
+                                 date=get_date_format(date),
+                                 team=team
+                                 )
+    tr.heroes.add(*heroes)
+    tr.save()
+
+    return len(heroes)

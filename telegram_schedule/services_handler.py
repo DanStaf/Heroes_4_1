@@ -1,20 +1,85 @@
 import os
-import psycopg2
 
-from heroes.models import Hero, Training, Branch, Team, Parent
+from heroes.models import Hero
 from users.models import User
 
-from telegram_schedule.services_connector import create_new_user_mentor, get_4_last_training_dates, get_teams, \
-    create_image, user_set_staff
+from telegram_schedule.services_db import create_new_user_mentor, get_4_last_training_dates, get_teams, create_training, get_attendance
 
-from config.settings import TG_API_TOKEN, DATABASES
+from config.settings import TG_API_TOKEN
 import telebot
+
 
 bot = telebot.TeleBot(TG_API_TOKEN)
 actual_polls = []
 
 # user_set_staff(1816252417)
 
+"""
+
+algorithm:
+
+1) start_message handler
+есть is_active: предложить действия
+есть не активен: ждём активации
+нет: ввод данных и регистрация (создать user, parent) offer_next_actions
+
+2) text_messages handler
+chose_action
+CRUD?
+
+NewHero ? C, Добавить новичка
+Hero - CR, Посмотреть людей, Добавить новичка
+Parent
+Branch
+Team
+Training - CR, Отметить явку, Посмотреть явку
+Course
+Payment - CR, добавить (авто), посмотреть
+
+### Payment example
+
+Order #1621331113
+1. Москва: 8000 (1 x 8000) Локация: Парк Лосиный остров, Абонемент: Абонемент на 4 тренировки 8000 руб.
+The order is paid for.
+Payment Amount: 8000 RUB
+Payment ID: Tinkoff Payment: 5483772318
+
+Purchaser information:
+Родитель: Наталья Спивак
+Дети: Федор Спивак
+Phone: +79683664621
+
+Additional information:
+Transaction ID: 7694333:6959736881
+Block ID: rec831865548
+Form Name: Cart
+https://xn--80aciihs1bdx6f.xn--p1ai/
+-----
+
+Order #1062728297
+1. Москва: 2500 (1 x 2500) Локация: Одинцово, Абонемент: Пробная тренировка 2500 руб.
+The order is paid for.
+Payment Amount: 2500 RUB
+Payment ID: Tinkoff Payment: 5452182606
+
+Purchaser information:
+Родитель: Андрей Волобуев
+Дети: Иван Волобуев
+Phone: +79164332541
+
+Additional information:
+Transaction ID: 7694333:6940307461
+Block ID: rec831865548
+Form Name: Cart
+https://xn--80aciihs1bdx6f.xn--p1ai/
+-----
+
+###
+
+3) poll answer handler
+create_training
+
+"""
 
 @bot.message_handler(commands=['start'])
 def start_message(message):
@@ -23,8 +88,13 @@ def start_message(message):
 
     try:
         response = User.objects.get(tg_id=message.from_user.id)
-        msg = bot.send_message(message.chat.id, f'Привет, {response.first_name}')
-        offer_next_actions(message)
+        bot.send_message(message.chat.id, f'Привет, {response.first_name}')
+        if response.is_active:
+            offer_next_actions(message)
+        else:
+            msg = bot.send_message(message.chat.id,
+                                   f'Пользователь ещё не активирован',
+                                   reply_markup=add_options_keyboard('start'))
 
     except Exception as e:
 
@@ -74,7 +144,8 @@ def input_email_and_register(message, phone):
         create_new_user_mentor(message, phone, email)
 
         text_message = f'''Приятно познакомиться, {message.from_user.first_name}! Внёс тебя в базу.
-Администратор скоро одобрит заявку, и сможешь зайти на сайт.'''
+Администратор скоро одобрит заявку, и сможешь зайти на сайт.
+Твой логин: {message.from_user.id}, пароль: 12345'''
 
         msg = bot.send_message(message.chat.id, text_message)
 
@@ -155,6 +226,9 @@ def add_options_keyboard(next_key=None):
                        'Вожатая',
                        'Вожатая 0+'
                        ]
+    elif next_key == 'start':
+        buttons = ['/start'
+                   ]
     elif next_key == 'date_':
         buttons = get_4_last_training_dates()
     elif next_key == 'team_':
@@ -418,145 +492,6 @@ def user_poll_input(poll_answer):
     bot.send_message(poll_answer.user.id, f'{len_heroes} героев отмечены')
 
 
-def get_date_format(text_date):
-
-    # 'Значение “08.09.2024” должно быть в формате YYYY-MM-DD.'
-    day = text_date[:2]
-    mon = text_date[3:5]
-    year = text_date[-4:]
-    return year + '-' + mon + '-' + day
-
-
-def get_attendance():
-    """ use direct SQL request """
-
-    dates = get_4_last_training_dates("%Y-%m-%d")
-    dates_repr = get_4_last_training_dates("%b%d")
-
-    conn_params = {
-        "host": DATABASES['default']['HOST'],
-        "database": DATABASES['default']['NAME'],
-        "user": DATABASES['default']['USER'],
-        "password": DATABASES['default']['PASSWORD']
-    }
-
-    teams = Team.objects.all()
-
-    total_result = []
-
-    for team in teams:
-
-        query = """
-                        SELECT
-                        heroes_hero.id,
-                        heroes_hero.name,
-                        heroes_hero.surname"""
-
-        for index, one_date_repr in enumerate(dates_repr):
-            query += f""",
-                        S{index}.training_date as {one_date_repr}"""
-
-        query += """
-                        from heroes_hero
-                        """
-
-        for index, one_date in enumerate(dates):
-            query += f"""
-                        FULL JOIN (SELECT
-                          hero_id,
-                          training_id,
-                          true as training_date
-                        FROM heroes_training_heroes A
-                        INNER JOIN heroes_training T on A.training_id = T.id
-                        WHERE T.date = '{one_date}' and T.team_id = {team.id}) as S{index}
-                        on heroes_hero.id = S{index}.hero_id
-                        """
-
-        query += """
-                        order by heroes_hero.id
-                        """
-
-        # ERROR - TeleBot: "Infinity polling exception: cannot open resource"
-        # line 304, in chose_action image_filename = get_attendance()
-
-        with psycopg2.connect(**conn_params) as conn:
-            with conn.cursor() as cur:
-                cur.execute(query)
-
-                result = cur.fetchall()
-
-        result.insert(0, (str(team), ))
-
-        total_result.extend(result)
-
-    total_result.insert(0, ('id', 'Имя', 'Фамилия') + tuple(dates_repr))
-
-    # [print(item) for item in total_result]
-
-    """
-    ('id', 'Имя', 'Фамилия', 'Sep01', 'Sep08', 'Sep15', 'Sep22')
-(1, 'Андрей', 'Новиков', True, True, True, None)
-(1, 'Андрей', 'Новиков', True, True, True, None)
-(2, 'Тихон', 'Стафеев', True, True, True, None) 
-(2, 'Тихон', 'Стафеев', True, True, True, None) 
-
-"""
-
-    image_filename = create_image(total_result)
-
-    return image_filename
-
-
-def get_attendance_2():
-    """NOT USED.
-    Want to do correct request by Django Model Objects.
-
-    в статусе Героя есть ячейка и наставник """
-
-    dates = get_4_last_training_dates("%Y-%m-%d")
-    dates_repr = get_4_last_training_dates("%b%d")
-    # id, hero, 4 dates
-    zero_line = ['id', 'Имя', 'Фамилия'] + dates_repr
-    my_data = [zero_line]
-
-    """result = Training.objects.filter(date__in=dates)
-
-    # [print(item) for item in result]
-
-
-
-    for cell in Cell.objects.all():
-        print(f'cell: {cell}')
-
-        for hero in Hero.object.all():
-
-
-        trainings = Training.objects.filter(date__in=dates, cell=cell)
-
-        for training in trainings:
-            print(f'date: {training.date}, heroes: {training.heroes.all()}')"""
-
-    """for training in result:
-        new_line = [f'{training.cell.location}, {training.date} {training.cell.day_time}']
-        my_data.append(new_line)
-
-        for hero in training.heroes.all():
-            new_line = [hero.pk, hero.name, hero.surname]
-            for date in dates:
-                print(training.date)
-                print(date)
-                if training.date is date:
-                    new_line.append(True)
-                else:
-                    new_line.append(False)
-                print(new_line)
-            my_data.append(new_line)"""
-
-    image_filename = create_image(my_data)
-
-    return image_filename
-
-
 def set_attendance_of_one_hero(message, hero, date, team_name):
 
     if message.text == 'Да':
@@ -576,30 +511,3 @@ def set_attendance_of_one_hero(message, hero, date, team_name):
                                reply_markup=add_options_keyboard())
 
     bot.register_next_step_handler(msg, chose_action)
-
-
-def create_training(team_name, tg_id, date, heroes):
-
-    user = User.objects.get(tg_id=tg_id)
-
-    ### not good!
-    mentor = Parent.objects.get(phone=user.phone)
-
-    # 'team_name': 'Москва. Одинцово вс 09:00 Стафеев'
-    split_text = team_name.split(' ')
-    branch_dt = ' '.join(split_text[:-1])
-    branch = Branch.objects.get(location=branch_dt[:-9])
-    day_time = branch_dt[-8:]
-    team_mentor = Parent.objects.get(surname=split_text[-1])
-
-    # checked
-    team = Team.objects.get(branch=branch, day_time=day_time, mentor=team_mentor)
-
-    tr = Training.objects.create(mentor=mentor,
-                                 date=get_date_format(date),
-                                 team=team
-                                 )
-    tr.heroes.add(*heroes)
-    tr.save()
-
-    return len(heroes)

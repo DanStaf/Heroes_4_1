@@ -7,6 +7,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 from heroes.models import Hero
 
+
 def start_scheduler(my_task, interval_sec):
     scheduler = BackgroundScheduler()
 

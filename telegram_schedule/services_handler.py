@@ -194,6 +194,67 @@ def start_polling():
 ##############
 
 
+def get_reply_keyboard(buttons: list):
+
+    keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=len(buttons))
+
+    b = []
+    i = 0
+    for text in buttons:
+        button = telebot.types.KeyboardButton(text)
+        b.append(button)
+
+        i += 1
+        if i > 1:
+            keyboard.add(*b)
+            b.clear()
+            i = 0
+
+    if i > 0:
+        keyboard.add(*b)
+
+    return keyboard
+
+
+def get_inline_keyboard(buttons: dict):
+    keyboard = telebot.types.InlineKeyboardMarkup(row_width=len(buttons))
+
+    b = []
+    i = 0
+    for key, value in buttons.items():
+
+        button = telebot.types.InlineKeyboardButton(value, callback_data=key)
+        b.append(button)
+
+        i += 1
+        if i > 1:
+            keyboard.add(*b)
+            b.clear()
+            i = 0
+
+    if i > 0:
+        keyboard.add(*b)
+
+    return keyboard
+
+
+def input_and_next_step(message, text, next_step, keyboard_text=None, *args):
+
+    if keyboard_text is None:
+        keyboard = None
+    elif keyboard_text == "":
+        keyboard = add_options_keyboard()
+    else:
+        keyboard = add_options_keyboard(keyboard_text)
+
+    msg = bot.send_message(message.chat.id, text, reply_markup=keyboard)
+
+    bot.register_next_step_handler(msg, next_step, *args)
+
+
+###############
+
+
 def offer_next_actions(message):
 
     input_and_next_step(message,
@@ -228,8 +289,7 @@ def add_options_keyboard(next_key=None):
             #       "Добавить ячейку",
             "Отметить явку",
             "Посмотреть явку",
-            "Посмотреть всех героев",
-            "Отмена"
+            "Посмотреть всех героев"
             ]
     elif next_key == 'start':
         buttons = ['/start'
@@ -283,49 +343,6 @@ def add_options_keyboard(next_key=None):
         return None
 
 
-def get_reply_keyboard(buttons: list):
-        keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=len(buttons))
-
-        b = []
-        i = 0
-        for text in buttons:
-            button = telebot.types.KeyboardButton(text)
-            b.append(button)
-
-            i += 1
-            if i > 1:
-                keyboard.add(*b)
-                b.clear()
-                i = 0
-
-        if i > 0:
-            keyboard.add(*b)
-
-        return keyboard
-
-
-def get_inline_keyboard(buttons: dict):
-        keyboard = telebot.types.InlineKeyboardMarkup(row_width=len(buttons))
-
-        b = []
-        i = 0
-        for key, value in buttons.items():
-
-            button = telebot.types.InlineKeyboardButton(value, callback_data=key)
-            b.append(button)
-
-            i += 1
-            if i > 1:
-                keyboard.add(*b)
-                b.clear()
-                i = 0
-
-        if i > 0:
-            keyboard.add(*b)
-
-        return keyboard
-
-
 def chose_action(message):
     if message.text == 'Отметить явку':
 
@@ -353,7 +370,7 @@ def chose_action(message):
 
         os.remove(image_filename)
 
-    elif message.text == 'Посмотреть всех людей':
+    elif message.text == 'Посмотреть всех героев':
 
         bot.send_message(message.chat.id, "Действие пока не реализовано")
 
@@ -440,12 +457,13 @@ def chose_action(message):
         bot.send_message(message.chat.id, "Действие пока не реализовано")
         flag = False
         """
-    elif message.text == 'Отмена':
+    elif message.text == '/start':
 
-        bot.send_message(message.chat.id, "ОК")
+        go_to_start(message, "ок")
 
     else:
         bot.send_message(message.chat.id, "Действие не опознано")
+
 
 ################
 
@@ -563,17 +581,3 @@ def set_attendance_of_one_hero(message, hero, date, team_name):
 
 
 ##############
-
-
-def input_and_next_step(message, text, next_step, keyboard_text=None, *args):
-
-    if keyboard_text is None:
-        keyboard = None
-    elif keyboard_text == "":
-        keyboard = add_options_keyboard()
-    else:
-        keyboard = add_options_keyboard(keyboard_text)
-
-    msg = bot.send_message(message.chat.id, text, reply_markup=keyboard)
-
-    bot.register_next_step_handler(msg, next_step, *args)

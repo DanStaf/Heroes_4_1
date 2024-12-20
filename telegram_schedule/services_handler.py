@@ -152,6 +152,9 @@ def input_email_and_register(message, phone):
         offer_next_actions(message)
 
 
+###############
+
+
 @bot.message_handler(func=lambda message: True)
 def text_messages(message):
     # print(message.from_user.username, 'sent:', message.text)
@@ -192,8 +195,17 @@ def add_options_keyboard(next_key=None):
             #       "Добавить ячейку",
             "Отметить явку",
             "Посмотреть явку",
-            "Посмотреть всех героев"
+            "Посмотреть всех героев",
+            "Отмена"
             ]
+    elif next_key == 'start':
+        buttons = ['/start'
+                   ]
+    elif next_key == 'date_':
+        buttons = get_4_last_training_dates()
+    elif next_key == 'team_':
+        buttons = get_teams()
+        """
 
     elif next_key == "sex":
         buttons = ["м",
@@ -226,13 +238,7 @@ def add_options_keyboard(next_key=None):
                        'Вожатая',
                        'Вожатая 0+'
                        ]
-    elif next_key == 'start':
-        buttons = ['/start'
-                   ]
-    elif next_key == 'date_':
-        buttons = get_4_last_training_dates()
-    elif next_key == 'team_':
-        buttons = get_teams()
+        """
     else:
         buttons = None
 
@@ -287,130 +293,120 @@ def get_inline_keyboard(buttons: dict):
 
 
 def chose_action(message):
+    if message.text == 'Отметить явку':
 
-        # print('chose_action:', message.text)
-        flag = True
+        msg = bot.send_message(message.chat.id,
+                               f'Выберите дату:',
+                               reply_markup=add_options_keyboard("date_"))
 
-        if message.text == 'Добавить наставника или вожатую':
-            new_line = {
-                'tg_id': '',
-                'name': None,
-                'surname': None,
-                'phone': None,
-                'mentor_level': ''
-            }
-            table_name = 'mentors'
+        bot.register_next_step_handler(msg, chose_team)
 
-        elif message.text == 'Добавить маму или папу':
-            new_line = {
-                'name': None,
-                'surname': None,
-                'phone': None,
-                'involvement': None,
-                'feedback': False,
-                'sex': None
-            }
-            table_name = 'parents'
+    elif message.text == 'Посмотреть явку':
 
-        elif message.text == 'Добавить героя':
-            new_line = {
-                'name': None,
-                'surname': None,
-                'birth_date': None,
-                'sex': None,
-                'mother_id': None,
-                'father_id': None,
-                'mentor_id': None,
-                'cell_id': None,
-                'new': None,
-                'first_training_date': None,
-                'planned_first_training_date': None,
-                'profile': None,
-                'photo': None
-            }
-            table_name = 'heroes'
+        image_filename = get_attendance()
+        text = 'Раз, два, три, ура!'
 
-        elif message.text == 'Добавить новичка':
-            new_line = {
-                'name': '',  # can skip
-                'surname': '',
-                'birth_date': '',
-                'sex': '',
-                'mother_id': None,  # mandatory
-                'cell_id': None,
-                'new': True,
-                'planned_first_training_date': None,
-            }
-            table_name = 'heroes'
+        with open(image_filename, 'rb') as img:
 
-            '''
-                    {'name': 'Имя', 'surname': '/skip',
-                    'birth_date': '/skip', 'sex': True,
-                    'mother_id': '2', 'cell_id': '2',
-                    'new': True, 'planned_first_training_date': '11'}
-                    hero added
-            '''
-        elif message.text == 'Добавить продукт':
-            bot.send_message(message.chat.id, "Действие пока не реализовано")
-            flag = False
+            msg = bot.send_photo(message.chat.id,
+                                 photo=img,
+                                 caption=text)
 
-        elif message.text == 'Добавить платёж':
-            bot.send_message(message.chat.id, "Действие пока не реализовано")
-            flag = False
+        os.remove(image_filename)
 
-        elif message.text == 'Добавить ячейку':
-            bot.send_message(message.chat.id, "Действие пока не реализовано")
-            flag = False
+    elif message.text == 'Посмотреть всех людей':
 
-        elif message.text == 'Отметить явку':
+        bot.send_message(message.chat.id, "Действие пока не реализовано")
 
-            msg = bot.send_message(message.chat.id,
-                                        f'Выберите дату:',
-                                        reply_markup=add_options_keyboard("date_"))
+        '''result = self.db.get_all_people()
+        full_data = ["" + item[2] + ': ' +
+                     (item[0] if item[0] is not None else "?") + ' ' +
+                     (item[1] if item[1] is not None else "?")
+                     for item in result]
 
-            bot.register_next_step_handler(msg, chose_team)
+        text_data = '\n'.join(full_data)
 
-            flag = False
-            # bot.send_message(message.chat.id, "Действие пока не реализовано")
+        self.bot.send_message(message.chat.id, text_data)
+        flag = False'''
+        """
 
-        elif message.text == 'Посмотреть явку':
+    elif message.text == 'Добавить наставника или вожатую':
+        new_line = {
+            'tg_id': '',
+            'name': None,
+            'surname': None,
+            'phone': None,
+            'mentor_level': ''
+        }
+        table_name = 'mentors'
 
-            image_filename = get_attendance()
-            text = 'Раз, два, три, ура!'
+    elif message.text == 'Добавить маму или папу':
+        new_line = {
+            'name': None,
+            'surname': None,
+            'phone': None,
+            'involvement': None,
+            'feedback': False,
+            'sex': None
+        }
+        table_name = 'parents'
 
-            with open(image_filename, 'rb') as img:
+    elif message.text == 'Добавить героя':
+        new_line = {
+            'name': None,
+            'surname': None,
+            'birth_date': None,
+            'sex': None,
+            'mother_id': None,
+            'father_id': None,
+            'mentor_id': None,
+            'cell_id': None,
+            'new': None,
+            'first_training_date': None,
+            'planned_first_training_date': None,
+            'profile': None,
+            'photo': None
+        }
+        table_name = 'heroes'
 
-                msg = bot.send_photo(message.chat.id,
-                                     photo=img,
-                                     caption=text)
+    elif message.text == 'Добавить новичка':
+        new_line = {
+            'name': '',  # can skip
+            'surname': '',
+            'birth_date': '',
+            'sex': '',
+            'mother_id': None,  # mandatory
+            'cell_id': None,
+            'new': True,
+            'planned_first_training_date': None,
+        }
+        table_name = 'heroes'
 
-            os.remove(image_filename)
+        '''
+                {'name': 'Имя', 'surname': '/skip',
+                'birth_date': '/skip', 'sex': True,
+                'mother_id': '2', 'cell_id': '2',
+                'new': True, 'planned_first_training_date': '11'}
+                hero added
+        '''
+    elif message.text == 'Добавить продукт':
+        bot.send_message(message.chat.id, "Действие пока не реализовано")
+        flag = False
 
-            flag = False
+    elif message.text == 'Добавить платёж':
+        bot.send_message(message.chat.id, "Действие пока не реализовано")
+        flag = False
 
-        elif message.text == 'Посмотреть всех людей':
+    elif message.text == 'Добавить ячейку':
+        bot.send_message(message.chat.id, "Действие пока не реализовано")
+        flag = False
+        """
+    elif message.text == 'Отмена':
 
-            bot.send_message(message.chat.id, "Действие пока не реализовано")
+        bot.send_message(message.chat.id, "ОК")
 
-            '''result = self.db.get_all_people()
-            full_data = ["" + item[2] + ': ' +
-                         (item[0] if item[0] is not None else "?") + ' ' +
-                         (item[1] if item[1] is not None else "?")
-                         for item in result]
-
-            text_data = '\n'.join(full_data)
-
-            self.bot.send_message(message.chat.id, text_data)
-            flag = False'''
-
-        else:
-            bot.send_message(message.chat.id, "Действие не опознано")
-            flag = False
-
-        if flag:
-            print('need to add smth')
-            # user_text_input(message, new_line, None, self.db.insert_values, table_name, self.offer_next_actions)
-
+    else:
+        bot.send_message(message.chat.id, "Действие не опознано")
 
 ################
 

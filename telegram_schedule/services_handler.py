@@ -92,18 +92,24 @@ def start_message(message):
         if response.is_active:
             offer_next_actions(message)
         else:
-            msg = bot.send_message(message.chat.id,
+            go_to_start(message, 'Пользователь ещё не активирован')
+            """            msg = bot.send_message(message.chat.id,
                                    f'Пользователь ещё не активирован',
                                    reply_markup=add_options_keyboard('start'))
-
+            """
     except Exception as e:
 
         text_message = f'''Привет {message.from_user.first_name}, я бот Heroes-CRM.
 Для регистрации напиши свой телефон:'''
 
-        msg = bot.send_message(message.chat.id, text_message)
+        input_and_next_step(message,
+                            text_message,
+                            input_phone_ask_email)
+
+        """msg = bot.send_message(message.chat.id, text_message)
 
         bot.register_next_step_handler(msg, input_phone_ask_email)
+        """
 
 
 def input_phone_ask_email(message):
@@ -114,17 +120,26 @@ def input_phone_ask_email(message):
         us = User.objects.get(phone=phone)
 
         text_message = f'''Пользователь с таким телефоном уже есть в базе. Напиши другой телефон.'''
-        msg = bot.send_message(message.chat.id, text_message)
+        input_and_next_step(message,
+                            text_message,
+                            input_phone_ask_email)
 
-        bot.register_next_step_handler(msg, input_phone_ask_email)
+        """msg = bot.send_message(message.chat.id, text_message)
+
+        bot.register_next_step_handler(msg, input_phone_ask_email)"""
 
     except Exception as e:
 
         text_message = f'''Ещё напиши пожалуйста твой email:'''
 
-        msg = bot.send_message(message.chat.id, text_message)
+        input_and_next_step(message,
+                            text_message,
+                            input_email_and_register,
+                            phone)
 
-        bot.register_next_step_handler(msg, input_email_and_register, phone=phone)
+        """msg = bot.send_message(message.chat.id, text_message)
+
+        bot.register_next_step_handler(msg, input_email_and_register, phone=phone)"""
 
 
 def input_email_and_register(message, phone):
@@ -135,9 +150,14 @@ def input_email_and_register(message, phone):
         us = User.objects.get(email=email)
 
         text_message = f'''Пользователь с таким email уже есть в базе. Напиши другой email.'''
-        msg = bot.send_message(message.chat.id, text_message)
 
-        bot.register_next_step_handler(msg, input_email_and_register, phone=phone)
+        input_and_next_step(message,
+                            text_message,
+                            input_email_and_register,
+                            phone)
+        """msg = bot.send_message(message.chat.id, text_message)
+
+        bot.register_next_step_handler(msg, input_email_and_register, phone=phone)"""
 
     except Exception as e:
 
@@ -147,9 +167,10 @@ def input_email_and_register(message, phone):
 Администратор скоро одобрит заявку, и сможешь зайти на сайт.
 Твой логин: {message.from_user.id}, пароль: 12345'''
 
-        msg = bot.send_message(message.chat.id, text_message)
+        go_to_start(message, text_message)
 
-        offer_next_actions(message)
+        """msg = bot.send_message(message.chat.id, text_message)
+        offer_next_actions(message)"""
 
 
 ###############
@@ -175,11 +196,23 @@ def start_polling():
 
 def offer_next_actions(message):
 
-    msg = bot.send_message(message.chat.id,
+    input_and_next_step(message,
+                        "Выбери действие:",
+                        chose_action,
+                        "")
+
+    """msg = bot.send_message(message.chat.id,
                            "Выбери действие:",
                            reply_markup=add_options_keyboard())
 
-    bot.register_next_step_handler(msg, chose_action)
+    bot.register_next_step_handler(msg, chose_action)"""
+
+
+def go_to_start(message, text):
+
+    msg = bot.send_message(message.chat.id,
+                           text,
+                           reply_markup=add_options_keyboard('start'))
 
 
 def add_options_keyboard(next_key=None):
@@ -205,16 +238,17 @@ def add_options_keyboard(next_key=None):
         buttons = get_4_last_training_dates()
     elif next_key == 'team_':
         buttons = get_teams()
+    elif next_key == "yn":
+        buttons = ["Да",
+                   "Нет"
+                   ]
         """
 
     elif next_key == "sex":
         buttons = ["м",
                        "ж"
                        ]
-    elif next_key == "yn":
-        buttons = ["Да",
-                   "Нет"
-                   ]
+    
     elif next_key == "new" or next_key == "profile" or next_key == "feedback":
         buttons = ["True",
                        "False"
@@ -295,11 +329,16 @@ def get_inline_keyboard(buttons: dict):
 def chose_action(message):
     if message.text == 'Отметить явку':
 
-        msg = bot.send_message(message.chat.id,
+        """msg = bot.send_message(message.chat.id,
                                f'Выберите дату:',
                                reply_markup=add_options_keyboard("date_"))
 
-        bot.register_next_step_handler(msg, chose_team)
+        bot.register_next_step_handler(msg, chose_team)"""
+
+        input_and_next_step(message,
+                            f'Выберите дату:',
+                            chose_team,
+                            "date_")
 
     elif message.text == 'Посмотреть явку':
 
@@ -412,13 +451,21 @@ def chose_action(message):
 
 
 def chose_team(message):
+    training_date = message.text
 
-    msg = bot.send_message(message.chat.id,
+    """msg = bot.send_message(message.chat.id,
                            f'Выберите отряд:',
                            reply_markup=add_options_keyboard("team_"))
 
-    training_date = message.text
+    
     bot.register_next_step_handler(msg, start_attendance_poll, training_date)
+    """
+
+    input_and_next_step(message,
+                        f'Выберите отряд:',
+                        start_attendance_poll,
+                        "team_",
+                        training_date)
 
 
 def start_attendance_poll(message, training_date):
@@ -435,12 +482,19 @@ def start_attendance_poll(message, training_date):
         msg = bot.send_message(message.chat.id, 'There are no Heroes')
 
     elif len(options) == 1:
-        msg = bot.send_message(message.chat.id,
-                               f"Явка за {training_date}: {options[0]}",
+
+        input_and_next_step(message,
+                            f"Явка за {training_date}: {options[0]}",
+                            set_attendance_of_one_hero,
+                            "yn",
+                            data[0], training_date, team_name)
+
+        """msg = bot.send_message(message.chat.id,
+                               ,
                                reply_markup=add_options_keyboard("yn"))
 
         bot.register_next_step_handler(msg, set_attendance_of_one_hero, data[0], training_date, team_name)
-
+"""
     else:
 
         msg = bot.send_poll(message.chat.id,
@@ -497,13 +551,29 @@ def set_attendance_of_one_hero(message, hero, date, team_name):
                         date,
                         [hero.id])
 
-        msg = bot.send_message(message.chat.id,
-                               f'1 герой отмечен',
-                               reply_markup=add_options_keyboard())
+        text_message = '1 герой отмечен'
 
     else:
-        msg = bot.send_message(message.chat.id,
-                               f'0 героев отмечены',
-                               reply_markup=add_options_keyboard())
+        text_message = '0 героев отмечены'
 
-    bot.register_next_step_handler(msg, chose_action)
+    input_and_next_step(message,
+                        text_message,
+                        chose_action,
+                        "")
+
+
+##############
+
+
+def input_and_next_step(message, text, next_step, keyboard_text=None, *args):
+
+    if keyboard_text is None:
+        keyboard = None
+    elif keyboard_text == "":
+        keyboard = add_options_keyboard()
+    else:
+        keyboard = add_options_keyboard(keyboard_text)
+
+    msg = bot.send_message(message.chat.id, text, reply_markup=keyboard)
+
+    bot.register_next_step_handler(msg, next_step, *args)
